@@ -1,46 +1,39 @@
 # 🚇 Onde anda o pica?
 
-**O passe pesa na carteira — e a multa ainda mais.** 
+> O passe pesa na carteira — e a multa ainda mais.
 
-"Onde Anda o Pica?" é uma web app leve e anónima que mostra avistamentos recentes de revisores nos transportes públicos em Portugal (começando pelos Metros de Lisboa e Porto).
+"Onde Anda o Pica?" é uma web app que mostra avistamentos recentes de revisores nos transportes públicos em Portugal (começando pelos Metros de Lisboa e Porto).
 
-Os relatos de avistamentos são submetidos por passageiros anónimos e apresentados em tempo quase real, organizados por linha, direção e hora.
+Os relatos de avistamentos são submetidos por passageiros anónimos e apresentados em tempo quase real.
 
-- 👉 Live: https://ondeandaopica.pt/
-- 👉 Formulário: https://forms.gle/ufkTC7mjBWwSbM7u7
-
-Projeto independente, feito por um humano e mantido pela comunidade.
-
----
-
-## 🧠 Como funciona
-
-O sistema é propositadamente simples:
-
-1. Utilizadores enviam relatos através de um Google Form.
-2. As respostas ficam guardadas num Google Sheets público.
-3. Uma página HTML estática consome os dados, aplica lógica de agrupamento em JS e renderiza a interface
-
-**Arquitetura:** Google Form → Google Sheets → HTML + JavaScript
+A página mostra apenas avistamentos das últimas 24 horas, organizados por linha, direção e hora. 
 
 ---
 
 ## 💻 Stack
 
-- Google Forms — recolha de relatos  
-- Google Sheets — armazenamento de dados  
-- HTML + CSS — frontend minimalista  
-- JavaScript — fetch + lógica de agrupamento  
-- GitHub Pages — hosting  
+Este projeto foi construído com uma filosofia de custo zero e complexidade mínima, utilizando apenas ferramentas estáticas e serviços gratuitos.
+
+**Arquitetura:** Google Form → Google Sheets → HTML + JavaScript → GitHub Pages
+
+
+| Componente     | Ferramenta        | Função                                                         |
+|---------------|-------------------|----------------------------------------------------------------|
+| Recolha       | Google Forms      | Submissão anónima de relatos de avistamentos                   |
+| Base de Dados | Google Sheets     | Armazenamento de dados e filtragem lógica   |
+| Frontend      | Vanilla JS        | Parsing de TSV, agrupamento de dados e renderização dinâmica           |
+| Hosting       | GitHub Pages      | Distribuição sob domínio próprio             |
 
 ---
 
 ## 🛠 Roadmap
 
-- Suporte a outras redes (CP, Fertagus, etc.)
-- Heatmap de estações com mais avistamentos
-- Notificações push / PWA instalável
-- Sistema de reputação ou “confiança” por avistamento
+Ideias em aberto:
+
+- Versão PWA: Tornar o site instalável no telemóvel.
+- Notificações Push: Sistema experimental de alertas por linha.
+- Heatmap: Visualização gráfica de estações com mais fiscalização.
+- Redes Ferroviárias: Inclusão da CP e Fertagus.
 
 ---
 
@@ -48,14 +41,24 @@ O sistema é propositadamente simples:
 
 Contribuições são muito bem-vindas:
 
-- Sugestões de UX e copy
-- Melhorias no código via pull request
-- Ideias para melhorias na arquitetura
+- 💻 Código: Melhorar o código via pull request.
+- 🎨 UX/UI: Sugerir formas de melhorar a apresentação mobile.
+- ✍️ Copy: Melhorar as mensagens de erro e instruções.
+- 📌 Expansão: Ajudar a mapear direções/estações de outras redes.
 
 ---
 
+## 📬 Contacto
+
+Tens dúvidas, queres dar feedback ou sugerir uma parceria?
+
+📩 info@ondeandaopica.pt
+
+---
 ## ⚠️ Disclaimer
 
-Este projeto não tem qualquer afiliação com operadores de transportes públicos ou privados.
+Este projeto é independente, feito por um humano e mantido pela comunidade.
 
-É uma ferramenta comunitária, experimental e sem fins lucrativos, criada para partilha informal de informação entre passageiros.
+É uma ferramenta experimental e sem fins lucrativos, criada para partilha informal de informação entre passageiros, sem qualquer afiliação a operadores de transportes públicos ou privados.
+
+---
