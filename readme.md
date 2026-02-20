@@ -2,14 +2,14 @@
 
 **O passe pesa na carteira — e a multa ainda mais.** 
 
-Projeto independente, feito por um humano e mantido pela comunidade.
-
 "Onde Anda o Pica?" é uma web app leve e anónima que mostra avistamentos recentes de revisores nos transportes públicos em Portugal (começando pelos Metros de Lisboa e Porto).
 
 Os relatos de avistamentos são submetidos por passageiros anónimos e apresentados em tempo quase real, organizados por linha, direção e hora.
 
 - 👉 Live: 
 - 👉 Formulário: https://forms.gle/ufkTC7mjBWwSbM7u7
+
+Projeto independente, feito por um humano e mantido pela comunidade.
 
 ---
 
