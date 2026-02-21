@@ -105,9 +105,9 @@ function updateStatus(isLive) {
   text.innerText = isLive ? "Live" : "Stale";
 }
 
-function buildCardHTML(group, colorMap) {
+function buildCardHTML(group) {
   return `
-    <div class="card ${colorMap[group.line] || ""}">
+    <div class="card ${group.color || ""}">
       <strong>Linha ${group.line} → ${group.direction}</strong>
       <div class="time">${group.maxPicas ? group.maxPicas + " picas" : ""}</div>
       <div class="time">${group.tempo || ""}</div>
@@ -129,7 +129,20 @@ async function fetchData() {
   try {
     const { data, error } = await supabaseClient
       .from("reports")
-      .select("*")
+      .select(`
+        id,
+        created_at,
+        picas,
+        tempo,
+        lines (
+          city,
+          name,
+          color
+        ),
+        directions (
+          label
+        )
+      `)
       .gte("created_at", new Date(Date.now() - 24*60*60*1000).toISOString())
       .order("created_at", { ascending: false });
 
@@ -152,16 +165,19 @@ function renderData() {
   const groups = {};
 
   cachedRows.forEach(row => {
-    if (row.city !== currentFilter) return;
+
+    if (!row.lines || !row.directions) return;
+    if (row.lines.city !== currentFilter) return;
 
     const timestamp = new Date(row.created_at);
     const hourKey = `${timestamp.getFullYear()}-${timestamp.getMonth()}-${timestamp.getDate()}-${timestamp.getHours()}`;
-    const key = `${row.line}|${row.direction}|${hourKey}`;
+    const key = `${row.lines.name}|${row.directions.label}|${hourKey}`;
 
     if (!groups[key]) {
       groups[key] = {
-        line: row.line,
-        direction: row.direction,
+        line: row.lines.name,
+        direction: row.directions.label,
+        color: row.lines.color,
         count: 0,
         timestamp
       };
@@ -187,21 +203,8 @@ function renderData() {
     return;
   }
 
-  const colorMap = {
-    "Azul": "azul",
-    "Verde": "verde",
-    "Amarela": "amarela",
-    "Vermelha": "vermelha",
-    "A": "azul",
-    "B": "vermelha",
-    "C": "verde",
-    "D": "amarela",
-    "E": "violeta",
-    "F": "laranja"
-  };
-
   container.innerHTML =
-    groupedEntries.map(g => buildCardHTML(g, colorMap)).join("");
+    groupedEntries.map(g => buildCardHTML(g)).join("");
 
   document.getElementById("last-update").innerText =
     "Atualizado às " +
