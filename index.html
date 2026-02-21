@@ -32,12 +32,10 @@ h1 { font-size:2.2rem;margin-bottom:6px;letter-spacing:-0.02em;}
 .status-bar { display:flex;justify-content:space-between;align-items:center;font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:18px;opacity:0.8;}
 .indicator-dot { height:8px;width:8px;border-radius:50%;display:inline-block;margin-right:6px;}
 .live-dot { background-color:#22c55e;box-shadow:0 0 8px #22c55e;}
-.offline-dot { background-color:#f59e0b;box-shadow:0 0 8px #f59e0b;}
 .card { background:#0f172a;border:1px solid rgba(255,255,255,0.05);border-left:6px solid #334155;border-radius:14px;padding:16px;margin-bottom:14px;text-align:left;}
 .time { opacity:0.6;font-size:0.85rem;margin-top:6px;}
 .empty { text-align:center;padding:40px;opacity:0.4;border:2px dashed #1e293b;border-radius:14px;}
 
-/* Modal */
 .modal { display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);justify-content:center;align-items:center;}
 .modal-content { background:#0f172a;padding:24px;border-radius:14px;width:90%;max-width:400px;text-align:left;}
 .modal-content h3 { margin-top:0;}
@@ -77,8 +75,8 @@ h1 { font-size:2.2rem;margin-bottom:6px;letter-spacing:-0.02em;}
 
 <div class="status-bar">
   <div>
-    <span id="status-dot" class="indicator-dot live-dot"></span>
-    <span id="status-text">Live</span>
+    <span class="indicator-dot live-dot"></span>
+    <span>Live</span>
   </div>
   <div id="last-update">A sincronizar...</div>
 </div>
@@ -86,7 +84,6 @@ h1 { font-size:2.2rem;margin-bottom:6px;letter-spacing:-0.02em;}
 <div id="updates-list"></div>
 </div>
 
-<!-- Modal -->
 <div id="reportModal" class="modal">
   <div class="modal-content">
     <div class="close-btn" onclick="closeModal()">Fechar ✕</div>
@@ -125,21 +122,64 @@ const supabaseClient = window.supabase.createClient(
   "sb_publishable_4UYJd6-oteBz1Jt0MTLgOg_LSZHOh2G"
 );
 
-let cachedRows = [];
+let cachedReports = [];
+let cachedLines = [];
 let currentFilter = "Lisboa";
 
-function openModal() {
-  document.getElementById("reportModal").style.display = "flex";
-}
-function closeModal() {
-  document.getElementById("reportModal").style.display = "none";
+function openModal(){ document.getElementById("reportModal").style.display="flex"; }
+function closeModal(){ document.getElementById("reportModal").style.display="none"; }
+
+async function loadLines(){
+  const { data } = await supabaseClient
+    .from("lines")
+    .select("*")
+    .order("name");
+
+  cachedLines = data || [];
 }
 
-async function submitReport() {
-  const city = document.getElementById("citySelect").value;
-  const line = document.getElementById("lineSelect").value;
-  const direction = document.getElementById("directionSelect").value;
-  const picas = document.getElementById("picasSelect").value;
+function populateLines(city){
+  const lineSelect = document.getElementById("lineSelect");
+  lineSelect.innerHTML = `<option value="">Linha</option>` +
+    cachedLines
+      .filter(l => l.city === city)
+      .map(l => `<option value="${l.name}">${l.name}</option>`)
+      .join("");
+
+  document.getElementById("directionSelect").innerHTML =
+    `<option value="">Direção</option>`;
+}
+
+async function loadDirections(lineName){
+  const line = cachedLines.find(l => l.name === lineName);
+  if(!line) return;
+
+  const { data } = await supabaseClient
+    .from("directions")
+    .select("*")
+    .eq("line_id", line.id)
+    .order("label");
+
+  const directionSelect = document.getElementById("directionSelect");
+  directionSelect.innerHTML = `<option value="">Direção</option>` +
+    (data || []).map(d =>
+      `<option value="${d.label}">${d.label}</option>`
+    ).join("");
+}
+
+document.getElementById("citySelect").addEventListener("change", e=>{
+  populateLines(e.target.value);
+});
+
+document.getElementById("lineSelect").addEventListener("change", e=>{
+  loadDirections(e.target.value);
+});
+
+async function submitReport(){
+  const city = citySelect.value;
+  const line = lineSelect.value;
+  const direction = directionSelect.value;
+  const picas = picasSelect.value;
 
   if(!city || !line || !direction){
     alert("Preenche todos os campos.");
@@ -154,37 +194,31 @@ async function submitReport() {
   }]);
 
   closeModal();
-  fetchData();
+  fetchReports();
 }
 
-function timeAgo(timestamp){
-  const diff = Math.floor((Date.now()-new Date(timestamp))/60000);
+function timeAgo(ts){
+  const diff = Math.floor((Date.now()-new Date(ts))/60000);
   if(diff < 1) return "agora mesmo";
   if(diff === 1) return "há 1 min";
   if(diff < 60) return `há ${diff} min`;
   return "há mais de 1h";
 }
 
-async function fetchData(){
-  try {
-    const { data, error } = await supabaseClient
-      .from("reports")
-      .select("*")
-      .gte("created_at", new Date(Date.now()-24*60*60*1000).toISOString())
-      .order("created_at",{ascending:false});
+async function fetchReports(){
+  const { data } = await supabaseClient
+    .from("reports")
+    .select("*")
+    .gte("created_at", new Date(Date.now()-86400000).toISOString())
+    .order("created_at",{ascending:false});
 
-    if(error) throw error;
-
-    cachedRows = data || [];
-    renderData();
-  } catch(err) {
-    console.error(err);
-  }
+  cachedReports = data || [];
+  renderReports();
 }
 
-function renderData(){
+function renderReports(){
   const container = document.getElementById("updates-list");
-  const rows = cachedRows.filter(r=>r.city === currentFilter);
+  const rows = cachedReports.filter(r=>r.city===currentFilter);
 
   if(rows.length===0){
     container.innerHTML =
@@ -202,25 +236,19 @@ function renderData(){
 
   document.getElementById("last-update").innerText =
     "Atualizado às " +
-    new Date().toLocaleTimeString('pt-PT',{
-      hour:'2-digit',
-      minute:'2-digit'
-    });
+    new Date().toLocaleTimeString('pt-PT',{hour:'2-digit',minute:'2-digit'});
 }
 
 function setFilter(city){
   currentFilter = city;
   document.querySelectorAll(".filters button").forEach(b=>b.classList.remove("active"));
   document.getElementById(`btn-${city.toLowerCase()}`).classList.add("active");
-  renderData();
+  renderReports();
 }
 
-fetchData();
-setInterval(fetchData,15000);
-
-</script>
-</body>
-</html>
+loadLines();
+fetchReports();
+setInterval(fetchReports,15000);
 
 </script>
 </body>
