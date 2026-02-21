@@ -8,7 +8,7 @@ Os relatos de avistamentos são submetidos de forma anónima por passageiros e a
 
 ## 💻 Stack
 
-Este projeto foi construído com uma filosofia de custo e complexidade mínima, utilizando apenas ferramentas e serviços gratuitos.
+Este projeto foi construído com uma filosofia de custo e complexidade mínimos, utilizando apenas ferramentas e serviços gratuitos.
 
 **Arquitetura:** Google Form → Google Sheets → HTML + JavaScript → GitHub Pages
 
@@ -27,7 +27,7 @@ Este projeto foi construído com uma filosofia de custo e complexidade mínima, 
 Se quiseres ajudar, abre um issue, faz uma fork, manda um PR, ou escreve para info@ondeandaopica.pt.
 
 - 💻 Código: Pull requests são bem-vindos, sejam correções ou novas funcionalidades.
-- 🎨 UX/UI: Sugestões para melhorar a experiência mobile, especialmente.
+- 🎨 UX/UI: Sugestões para melhorar a interface, especialmente a experiência mobile.
 - 📌 Expansão: Ajudar a mapear direções/estações de outras redes.
 
 ## 🛠 Roadmap
@@ -41,4 +41,4 @@ Ideias em aberto:
 
 ## ⚠️ Disclaimer
 
-Onde anda o pica? é um projeto experimental independente e sem fins lucrativos, criado para partilha informal de informação entre passageiros, sem qualquer afiliação a operadores de transportes públicos ou privados.
+"Onde anda o pica?" é um projeto experimental independente e sem fins lucrativos, criado para partilha informal de informação entre passageiros, sem qualquer afiliação a operadores de transportes públicos ou privados.
