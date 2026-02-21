@@ -259,9 +259,13 @@ function setFilter(city){
   document.getElementById(`btn-${city.toLowerCase()}`).classList.add("active");
   renderReports();
 }
+  
+async function init(){
+  await loadLines();   // ensure lines are loaded first
+  await fetchReports();
+}
 
-loadLines();
-fetchReports();
+init();
 setInterval(fetchReports,15000);
 
 </script>
