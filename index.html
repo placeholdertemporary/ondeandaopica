@@ -18,7 +18,8 @@
 <style>
 body { margin:0;font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#020617;color:#f1f5f9;padding-bottom:50px;}
 .container { max-width:680px;margin:0 auto;padding:20px;text-align:center;position:relative;}
-h1 { font-size:2.2rem;margin-bottom:6px;letter-spacing:-0.02em;}
+header { padding-top: 50px; }
+h1 { font-size:2.2rem; margin-bottom:6px; letter-spacing:-0.02em; }
 .subtitle { opacity:0.6;font-size:0.95rem;margin-bottom:28px;line-height:1.5;}
 .about-btn { position:absolute;top:20px;right:20px;font-size:0.8rem;text-decoration:none;padding:6px 10px;border-radius:8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);color:#cbd5e1;transition:0.2s ease;}
 .about-btn:hover { background:rgba(255,255,255,0.14);}
@@ -32,34 +33,27 @@ h1 { font-size:2.2rem;margin-bottom:6px;letter-spacing:-0.02em;}
 .status-bar { display:flex;justify-content:space-between;align-items:center;font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:18px;opacity:0.8;}
 .indicator-dot { height:8px;width:8px;border-radius:50%;display:inline-block;margin-right:6px;}
 .live-dot { background-color:#22c55e;box-shadow:0 0 8px #22c55e;}
+.stale-dot { background-color:#f59e0b;box-shadow:0 0 8px #f59e0b;}
 .card { background:#0f172a;border:1px solid rgba(255,255,255,0.05);border-left:6px solid #334155;border-radius:14px;padding:16px;margin-bottom:14px;text-align:left;}
 .time { opacity:0.6;font-size:0.85rem;margin-top:6px;}
 .empty { text-align:center;padding:40px;opacity:0.4;border:2px dashed #1e293b;border-radius:14px;}
-
-.modal { display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);justify-content:center;align-items:center;}
+.modal { display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);justify-content:center;align-items:center;z-index:100;}
 .modal-content { background:#0f172a;padding:24px;border-radius:14px;width:90%;max-width:400px;text-align:left;}
 .modal-content h3 { margin-top:0;}
 .modal-content select, .modal-content button {
   width:100%;margin-bottom:12px;padding:10px;border-radius:8px;border:1px solid #1e293b;background:#020617;color:#f1f5f9;
 }
-.close-btn { text-align:right;font-size:0.8rem;cursor:pointer;opacity:0.6;}
+.close-btn { text-align:right;font-size:0.8rem;cursor:pointer;opacity:0.6;margin-bottom:10px;}
 </style>
 </head>
 <body>
 
 <div class="container">
-
-<a href="https://github.com/placeholdertemporary/ondeandaopica"
-   target="_blank"
-   rel="noopener noreferrer"
-   class="about-btn">
-  Sobre o projeto
-</a>
-
-<h1>Onde anda o pica?</h1>
-<div class="subtitle">
-   O passe pesa na carteira — a multa ainda mais.
-</div>
+<header>
+  <a href="https://github.com/placeholdertemporary/ondeandaopica" target="_blank" rel="noopener noreferrer" class="about-btn">Sobre o projeto</a>
+  <h1>Onde anda o pica?</h1>
+  <div class="subtitle">O passe pesa na carteira — a multa ainda mais.</div>
+</header>
 
 <div class="cta-wrapper">
   <div class="cta-badge">
@@ -75,10 +69,10 @@ h1 { font-size:2.2rem;margin-bottom:6px;letter-spacing:-0.02em;}
 
 <div class="status-bar">
   <div>
-    <span class="indicator-dot live-dot"></span>
-    <span>Live</span>
+    <span id="status-dot" class="indicator-dot stale-dot"></span>
+    <span id="status-text">A conectar...</span>
   </div>
-  <div id="last-update">A sincronizar...</div>
+  <div id="last-update">...</div>
 </div>
 
 <div id="updates-list"></div>
@@ -90,33 +84,32 @@ h1 { font-size:2.2rem;margin-bottom:6px;letter-spacing:-0.02em;}
     <h3>Reportar avistamento</h3>
 
     <select id="citySelect">
-      <option value="">Cidade</option>
+      <option value="" disabled hidden>Cidade</option>
       <option value="Lisboa">Lisboa</option>
       <option value="Porto">Porto</option>
     </select>
 
     <select id="lineSelect">
-      <option value="">Linha</option>
+      <option value="" disabled selected hidden>Linha</option>
     </select>
 
     <select id="directionSelect">
-      <option value="">Direção</option>
+      <option value="" disabled selected hidden>Direção</option>
     </select>
 
     <select id="picasSelect">
-      <option value="">Nº picas</option>
+      <option value="" disabled selected hidden>Nº picas</option>
       <option value="1">1</option>
       <option value="2">2</option>
       <option value="3">3+</option>
     </select>
 
-    <button onclick="submitReport()">Enviar</button>
+    <button id="submitBtn" onclick="submitReport()">Enviar</button>
   </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-
 const supabaseClient = window.supabase.createClient(
   "https://yluetigafaiuwxotezay.supabase.co",
   "sb_publishable_4UYJd6-oteBz1Jt0MTLgOg_LSZHOh2G"
@@ -126,82 +119,100 @@ let cachedReports = [];
 let cachedLines = [];
 let currentFilter = "Lisboa";
 
+function escapeHTML(str) {
+  if (!str) return "";
+  return str.toString().replace(/[&<>"']/g, m => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[m]));
+}
+
 function openModal(){ 
   document.getElementById("reportModal").style.display="flex";
-
-  const citySelect = document.getElementById("citySelect");
-  citySelect.value = currentFilter;
-
+  document.getElementById("citySelect").value = currentFilter;
   populateLines(currentFilter);
 }
-  function closeModal(){ document.getElementById("reportModal").style.display="none"; }
+
+function closeModal(){ document.getElementById("reportModal").style.display="none"; }
 
 async function loadLines(){
-  const { data } = await supabaseClient
-    .from("lines")
-    .select("*")
-    .order("name");
-
+  const { data, error } = await supabaseClient.from("lines").select("*").order("name");
+  if(error){
+    console.error("Error loading lines:", error);
+    updateStatus(false);
+    return;
+  }
   cachedLines = data || [];
 }
 
 function populateLines(city){
   const lineSelect = document.getElementById("lineSelect");
-  lineSelect.innerHTML = `<option value="">Linha</option>` +
+  lineSelect.value = "";
+  document.getElementById("directionSelect").value = "";
+
+  lineSelect.innerHTML =
+    `<option value="" disabled selected hidden>Linha</option>` +
     cachedLines
       .filter(l => l.city === city)
-      .map(l => `<option value="${l.name}">${l.name}</option>`)
+      .map(l => `<option value="${escapeHTML(l.name)}">${escapeHTML(l.name)}</option>`)
       .join("");
 
   document.getElementById("directionSelect").innerHTML =
-    `<option value="">Direção</option>`;
+    `<option value="" disabled selected hidden>Direção</option>`;
 }
 
 async function loadDirections(lineName){
-  const line = cachedLines.find(l => l.name === lineName);
+  const city = document.getElementById("citySelect").value;
+  const line = cachedLines.find(l => l.name === lineName && l.city === city);
   if(!line) return;
 
-  const { data } = await supabaseClient
+  const { data, error } = await supabaseClient
     .from("directions")
     .select("*")
     .eq("line_id", line.id)
     .order("label");
 
-  const directionSelect = document.getElementById("directionSelect");
-  directionSelect.innerHTML = `<option value="">Direção</option>` +
-    (data || []).map(d =>
-      `<option value="${d.label}">${d.label}</option>`
-    ).join("");
-}
-
-document.getElementById("citySelect").addEventListener("change", e=>{
-  populateLines(e.target.value);
-});
-
-document.getElementById("lineSelect").addEventListener("change", e=>{
-  loadDirections(e.target.value);
-});
-
-async function submitReport(){
-  const city = citySelect.value;
-  const line = lineSelect.value;
-  const direction = directionSelect.value;
-  const picas = picasSelect.value;
-
-  if(!city || !line || !direction){
-    alert("Preenche todos os campos.");
+  if(error){
+    console.error("Error loading directions:", error);
     return;
   }
 
-  await supabaseClient.from("reports").insert([{
-    city,
-    line,
-    direction,
-    picas: picas || null
+  document.getElementById("directionSelect").innerHTML =
+    `<option value="" disabled selected hidden>Direção</option>` +
+    (data || []).map(d =>
+      `<option value="${escapeHTML(d.label)}">${escapeHTML(d.label)}</option>`
+    ).join("");
+}
+
+document.getElementById("citySelect").addEventListener("change", e => populateLines(e.target.value));
+document.getElementById("lineSelect").addEventListener("change", e => loadDirections(e.target.value));
+
+async function submitReport(){
+  const lastReport = localStorage.getItem('last_report_pica');
+  if (lastReport && (Date.now() - parseInt(lastReport)) < 300000) {
+    alert("Calma! Só podes reportar uma vez a cada 5 minutos.");
+    return;
+  }
+
+  const city = document.getElementById("citySelect").value;
+  const line = document.getElementById("lineSelect").value;
+  const direction = document.getElementById("directionSelect").value;
+  const picas = document.getElementById("picasSelect").value;
+
+  if(!city || !line || !direction){
+    alert("Preenche todos os campos obrigatórios.");
+    return;
+  }
+
+  const { error } = await supabaseClient.from("reports").insert([{
+    city, line, direction, picas: picas || null
   }]);
 
-  closeModal();
-  fetchReports();
+  if(error) {
+    alert("Erro ao enviar. Tenta de novo.");
+  } else {
+    localStorage.setItem('last_report_pica', Date.now());
+    closeModal();
+  }
 }
 
 function timeAgo(ts){
@@ -213,68 +224,96 @@ function timeAgo(ts){
 }
 
 async function fetchReports(){
-  const { data } = await supabaseClient
+  const { data, error } = await supabaseClient
     .from("reports")
     .select("*")
+    .eq("city", currentFilter)
     .gte("created_at", new Date(Date.now()-86400000).toISOString())
     .order("created_at",{ascending:false});
+
+  if(error){
+    console.error("Error fetching reports:", error);
+    updateStatus(false);
+    return;
+  }
 
   cachedReports = data || [];
   renderReports();
 }
+
 function renderReports(){
   const container = document.getElementById("updates-list");
+  const filteredRows = cachedReports;
 
-  const rows = cachedReports.filter(
-    r => r.city && r.city.toLowerCase() === currentFilter.toLowerCase()
-  );
-
-  if(rows.length===0){
-    container.innerHTML =
-      `<div class="empty">Nenhum avistamento reportado nas últimas 24 horas. Sorte a tua!</div>`;
+  if(filteredRows.length === 0){
+    container.innerHTML = `<div class="empty">Nenhum avistamento nas últimas 24h. Sorte a tua!</div>`;
     return;
   }
 
-  container.innerHTML = rows.map(r => {
-
-    const lineObj = cachedLines.find(
-      l => l.name === r.line && l.city === r.city
-    );
-
+  container.innerHTML = filteredRows.map(r => {
+    const lineObj = cachedLines.find(l => l.name === r.line && l.city === r.city);
     const lineColor = lineObj ? lineObj.color : "#334155";
 
     return `
       <div class="card" style="border-left:6px solid ${lineColor}">
-        <strong>Linha ${r.line} → ${r.direction}</strong>
-        ${r.picas ? `<div class="time">${r.picas} picas</div>` : ""}
+        <strong>Linha ${escapeHTML(r.line)} → ${escapeHTML(r.direction)}</strong>
+        ${r.picas ? `<div class="time">${escapeHTML(r.picas)} picas</div>` : ""}
         <div class="time">${timeAgo(r.created_at)}</div>
       </div>
     `;
   }).join("");
 
   document.getElementById("last-update").innerText =
-    "Atualizado às " +
-    new Date().toLocaleTimeString('pt-PT',{
-      hour:'2-digit',
-      minute:'2-digit'
-    });
+    "Sincronizado: " +
+    new Date().toLocaleTimeString('pt-PT',{hour:'2-digit',minute:'2-digit'});
 }
 
 function setFilter(city){
   currentFilter = city;
   document.querySelectorAll(".filters button").forEach(b=>b.classList.remove("active"));
   document.getElementById(`btn-${city.toLowerCase()}`).classList.add("active");
-  renderReports();
+  fetchReports();
+}
+
+function updateStatus(isLive) {
+  const dot = document.getElementById("status-dot");
+  const text = document.getElementById("status-text");
+  if(isLive) {
+    dot.className = "indicator-dot live-dot";
+    text.innerText = "Live";
+  } else {
+    dot.className = "indicator-dot stale-dot";
+    text.innerText = "Stale";
+  }
 }
   
 async function init(){
-  await loadLines();   // ensure lines are loaded first
+  await loadLines();
   await fetchReports();
+
+  const channel = supabaseClient.channel('reports-realtime');
+  
+  channel
+    .on('postgres_changes',
+      { event: 'INSERT', schema: 'public', table: 'reports' },
+      payload => {
+        const exists = cachedReports.some(r => r.id === payload.new.id);
+        if(!exists && payload.new.city === currentFilter){
+          cachedReports.unshift(payload.new);
+          renderReports();
+        }
+      }
+    )
+    .subscribe((status) => {
+      if (status === 'SUBSCRIBED') updateStatus(true);
+      else if (status === 'CLOSED' || status === 'CHANNEL_ERROR') updateStatus(false);
+    });
+
+  window.addEventListener('online', () => updateStatus(true));
+  window.addEventListener('offline', () => updateStatus(false));
 }
 
 init();
-setInterval(fetchReports,15000);
-
 </script>
 </body>
 </html>
