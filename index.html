@@ -9,6 +9,12 @@
 <link rel="apple-touch-icon" href="/preview.png">
 <link rel="shortcut icon" href="/preview.png">
 <link rel="manifest" href="/manifest.json">
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js');
+  }
+</script>
+
 <meta name="theme-color" content="#020617">
 <meta property="og:title" content="Onde anda o pica?">
 <meta property="og:description" content="O passe pesa na carteira — a multa ainda mais.">
@@ -366,9 +372,10 @@ async function init(){
       else if (status === 'CLOSED' || status === 'CHANNEL_ERROR') updateStatus(false);
     });
 // inside init(), after the channel.subscribe() block
+// Optimized: Recalculates "time ago" labels without hitting the database
 setInterval(() => {
-  fetchReports();
-}, 60000); // silently re-fetches every 60 seconds
+  renderReports(); 
+}, 60000);
   
   // Native browser online/offline events as a fallback signal
   window.addEventListener('online', () => updateStatus(true));
