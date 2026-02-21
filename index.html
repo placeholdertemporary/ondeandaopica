@@ -3,295 +3,112 @@
 <head>
 <meta charset="UTF-8">
 
-<!-- Mobile-first viewport.
-     maximum-scale prevents zoom layout jumps on iOS -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 
 <title>Onde anda o pica?</title>
 <link rel="icon" type="image/png" href="/preview.png">
 <link rel="apple-touch-icon" href="/preview.png">
 <link rel="shortcut icon" href="/preview.png">
-<!-- Sets browser UI color (Android address bar, etc.) -->
 <meta name="theme-color" content="#020617">
 <meta property="og:title" content="Onde anda o pica?">
 <meta property="og:description" content="O passe pesa na carteira — a multa ainda mais.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://ondeandaopica.pt">
 <meta property="og:image" content="https://ondeandaopica.pt/preview.png">
+
 <style>
-
-/* =========================================================
-   GLOBAL LAYOUT
-   ========================================================= */
-
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-  background: #020617;   /* Dark background */
-  color: #f1f5f9;        /* Soft light text */
-  padding-bottom: 50px;  /* Space at bottom for breathing room */
-}
-
-/* Main centered content wrapper */
-.container {
-  max-width: 680px;
-  margin: 0 auto;
-  padding: 20px;
-  text-align: center;
-  position: relative; /* Required for absolute About button */
-}
-
-h1 {
-  font-size: 2.2rem;
-  margin-bottom: 6px;
-  letter-spacing: -0.02em;
-}
-
-.subtitle {
-  opacity: 0.6;
-  font-size: 0.95rem;
-  margin-bottom: 28px;
-  line-height: 1.5;
-}
-
-/* =========================================================
-   ABOUT BUTTON (Top-right GitHub link)
-   ========================================================= */
-
-.about-btn {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  font-size: 0.8rem;
-  text-decoration: none;
-  padding: 6px 10px;
-  border-radius: 8px;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.08);
-  color: #cbd5e1;
-  transition: 0.2s ease;
-}
-
-.about-btn:hover {
-  background: rgba(255,255,255,0.14);
-}
-
-/* =========================================================
-   CTA SECTION
-   ========================================================= */
-
-.cta-wrapper { margin-bottom: 35px; }
-
-/* Glass-style wrapper */
-.cta-badge {
-  display: inline-block;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 16px;
-  padding: 18px 22px;
-  backdrop-filter: blur(8px);
-}
-
-.cta-text {
-  font-size: 0.9rem;
-  margin-bottom: 12px;
-  opacity: 0.85;
-}
-
-/* Primary red submission button */
-.cta-button {
-  display: inline-block;
-  background: #e5392b;
-  color: #ffffff;
-  text-decoration: none;
-  padding: 12px 22px;
-  border-radius: 10px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  box-shadow: 0 6px 18px rgba(229,57,43,0.25);
-}
-
-/* =========================================================
-   CITY FILTER BUTTONS
-   ========================================================= */
-
-.filters { margin-bottom: 18px; }
-
-.filters button {
-  background: #0f172a;
-  border: 1px solid rgba(255,255,255,0.08);
-  color: #cbd5e1;
-  padding: 8px 16px;
-  margin: 4px;
-  border-radius: 10px;
-  cursor: pointer;
-  font-size: 0.85rem;
-  font-weight: 600;
-}
-
-/* Active city visually inverted */
-.filters button.active {
-  background: #f1f5f9;
-  color: #020617;
-}
-
-/* =========================================================
-   STATUS BAR
-   ========================================================= */
-
-/* Shows:
-   - Connection status (Live / Stale)
-   - Last update time
-*/
-.status-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 18px;
-  opacity: 0.8;
-}
-
-.indicator-dot {
-  height: 8px;
-  width: 8px;
-  border-radius: 50%;
-  display: inline-block;
-  margin-right: 6px;
-}
-
-/* Green = fetch successful */
-.live-dot {
-  background-color: #22c55e;
-  box-shadow: 0 0 8px #22c55e;
-}
-
-/* Orange = fetch failed */
-.offline-dot {
-  background-color: #f59e0b;
-  box-shadow: 0 0 8px #f59e0b;
-}
-
-/* =========================================================
-   CARDS
-   ========================================================= */
-
-/* Base card layout */
-.card {
-  background: #0f172a;
-  border: 1px solid rgba(255,255,255,0.05);
-  border-left: 6px solid #334155; /* Default fallback */
-  border-radius: 14px;
-  padding: 16px;
-  margin-bottom: 14px;
-  text-align: left;
-}
-
-/* Color accents per line */
-.card.azul { border-left-color: #3b6ea8; }
-.card.verde { border-left-color: #2f855a; }
-.card.amarela { border-left-color: #d4a017; }
-.card.vermelha { border-left-color: #c24141; }
-.card.violeta { border-left-color: #7c3aed; }
-.card.laranja { border-left-color: #d97706; }
-
-.time {
-  opacity: 0.6;
-  font-size: 0.85rem;
-  margin-top: 6px;
-}
-
-/* Appears if multiple reports in same hour group */
-.group-badge {
-  margin-top: 10px;
-  font-size: 0.8rem;
-  background: rgba(255, 120, 0, 0.15);
-  color: #ff9800;
-  padding: 6px 10px;
-  border-radius: 8px;
-  display: inline-block;
-}
-
-/* Empty state when no rows match */
-.empty {
-  text-align: center;
-  padding: 40px;
-  opacity: 0.4;
-  border: 2px dashed #1e293b;
-  border-radius: 14px;
-}
-
+/* (ALL YOUR CSS REMAINS EXACTLY THE SAME — UNCHANGED) */
+body { margin:0;font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#020617;color:#f1f5f9;padding-bottom:50px;}
+.container { max-width:680px;margin:0 auto;padding:20px;text-align:center;position:relative;}
+h1 { font-size:2.2rem;margin-bottom:6px;letter-spacing:-0.02em;}
+.subtitle { opacity:0.6;font-size:0.95rem;margin-bottom:28px;line-height:1.5;}
+.about-btn { position:absolute;top:20px;right:20px;font-size:0.8rem;text-decoration:none;padding:6px 10px;border-radius:8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);color:#cbd5e1;transition:0.2s ease;}
+.about-btn:hover { background:rgba(255,255,255,0.14);}
+.cta-wrapper { margin-bottom:35px;}
+.cta-badge { display:inline-block;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:18px 22px;backdrop-filter:blur(8px);}
+.cta-text { font-size:0.9rem;margin-bottom:12px;opacity:0.85;}
+.cta-button { display:inline-block;background:#e5392b;color:#ffffff;text-decoration:none;padding:12px 22px;border-radius:10px;font-size:0.85rem;font-weight:600;box-shadow:0 6px 18px rgba(229,57,43,0.25);}
+.filters { margin-bottom:18px;}
+.filters button { background:#0f172a;border:1px solid rgba(255,255,255,0.08);color:#cbd5e1;padding:8px 16px;margin:4px;border-radius:10px;cursor:pointer;font-size:0.85rem;font-weight:600;}
+.filters button.active { background:#f1f5f9;color:#020617;}
+.status-bar { display:flex;justify-content:space-between;align-items:center;font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:18px;opacity:0.8;}
+.indicator-dot { height:8px;width:8px;border-radius:50%;display:inline-block;margin-right:6px;}
+.live-dot { background-color:#22c55e;box-shadow:0 0 8px #22c55e;}
+.offline-dot { background-color:#f59e0b;box-shadow:0 0 8px #f59e0b;}
+.card { background:#0f172a;border:1px solid rgba(255,255,255,0.05);border-left:6px solid #334155;border-radius:14px;padding:16px;margin-bottom:14px;text-align:left;}
+.card.azul { border-left-color:#3b6ea8;}
+.card.verde { border-left-color:#2f855a;}
+.card.amarela { border-left-color:#d4a017;}
+.card.vermelha { border-left-color:#c24141;}
+.card.violeta { border-left-color:#7c3aed;}
+.card.laranja { border-left-color:#d97706;}
+.time { opacity:0.6;font-size:0.85rem;margin-top:6px;}
+.group-badge { margin-top:10px;font-size:0.8rem;background:rgba(255,120,0,0.15);color:#ff9800;padding:6px 10px;border-radius:8px;display:inline-block;}
+.empty { text-align:center;padding:40px;opacity:0.4;border:2px dashed #1e293b;border-radius:14px;}
 </style>
 </head>
 <body>
 
 <div class="container">
 
-  <!-- GitHub project link -->
-  <a href="https://github.com/placeholdertemporary/ondeandaopica"
-     target="_blank"
-     rel="noopener noreferrer"
-     class="about-btn">
-    Sobre o projeto
-  </a>
+<a href="https://github.com/placeholdertemporary/ondeandaopica"
+   target="_blank"
+   rel="noopener noreferrer"
+   class="about-btn">
+  Sobre o projeto
+</a>
 
-  <h1>Onde anda o pica?</h1>
-  <div class="subtitle">
-     O passe pesa na carteira — a multa ainda mais.
-  </div>
-
-  <!-- CTA section -->
-  <div class="cta-wrapper">
-    <div class="cta-badge">
-      <div class="cta-text">Viste um pica? Avisa a malta.</div>
-      <a class="cta-button"
-         href="https://forms.gle/6eaKK6AMvYhuVrsB6"
-         target="_blank">REPORTA AQUI</a>
-    </div>
-  </div>
-
-  <!-- City filter toggle -->
-  <div class="filters">
-    <button id="btn-lisboa" class="active" onclick="setFilter('Lisboa')">Lisboa</button>
-    <button id="btn-porto" onclick="setFilter('Porto')">Porto</button>
-  </div>
-
-  <!-- Status display -->
-  <div class="status-bar">
-    <div>
-      <span id="status-dot" class="indicator-dot live-dot"></span>
-      <span id="status-text">Live</span>
-    </div>
-    <div id="last-update">A sincronizar...</div>
-  </div>
-
-  <!-- Dynamic cards injected here -->
-  <div id="updates-list"></div>
+<h1>Onde anda o pica?</h1>
+<div class="subtitle">
+   O passe pesa na carteira — a multa ainda mais.
 </div>
+
+<div class="cta-wrapper">
+  <div class="cta-badge">
+    <div class="cta-text">Viste um pica? Avisa a malta.</div>
+    <a class="cta-button"
+       href="https://forms.gle/6eaKK6AMvYhuVrsB6"
+       target="_blank">REPORTA AQUI</a>
+  </div>
+</div>
+
+<div class="filters">
+  <button id="btn-lisboa" class="active" onclick="setFilter('Lisboa')">Lisboa</button>
+  <button id="btn-porto" onclick="setFilter('Porto')">Porto</button>
+</div>
+
+<div class="status-bar">
+  <div>
+    <span id="status-dot" class="indicator-dot live-dot"></span>
+    <span id="status-text">Live</span>
+  </div>
+  <div id="last-update">A sincronizar...</div>
+</div>
+
+<div id="updates-list"></div>
+</div>
+
+<!-- Supabase Client -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
 
-/* =========================================================
-   CONFIGURATION
-   ========================================================= */
+/* ===============================
+   SUPABASE CONFIG
+================================ */
 
-/* Public Google Sheets TSV endpoint.
-*/
-const TSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSWA2yLCMN94pQiXOBZCKfylJ8IabIeoePmRP-toMmQtCzrQdjuaV5UR--SYtp3KqhYGBHyNioC1xxL/pub?gid=2130801913&single=true&output=tsv";
+const supabase = window.supabase.createClient(
+  "https://yluetigafaiuwxotezay.supabase.co",
+  "sb_publishable_4UYJd6-oteBz1Jt0MTLgOg_LSZHOh2G"
+);
 
-/* Current selected city filter */
 let currentFilter = "Lisboa";
-
-/* Cached rows from last successful fetch */
 let cachedRows = null;
 
-/* =========================================================
-   HELPER FUNCTIONS
-   ========================================================= */
+/* ===============================
+   STATUS
+================================ */
 
-/* Update status indicator UI */
 function updateStatus(isLive) {
   const dot = document.getElementById("status-dot");
   const text = document.getElementById("status-text");
@@ -300,28 +117,10 @@ function updateStatus(isLive) {
   text.innerText = isLive ? "Live" : "Stale";
 }
 
-/* Convert TSV string into array of rows */
-function parseTSV(text) {
-  return text.trim().split("\n").map(r => r.split("\t"));
-}
+/* ===============================
+   GROUPING LOGIC (UNCHANGED BEHAVIOR)
+================================ */
 
-/* Parse Portuguese timestamp format dd/mm/yy hh:mm */
-function parseTimestamp(raw) {
-  if (!raw) return null;
-
-  const [datePart, timePart] = raw.split(" ");
-  if (!datePart || !timePart) return null;
-
-  const [day, month, yearShort] = datePart.split("/");
-  const [hour, minute] = timePart.split(":");
-
-  const year = parseInt("20" + yearShort);
-  const date = new Date(year, month - 1, day, hour, minute);
-
-  return isNaN(date) ? null : date;
-}
-
-/* Generate HTML string for one grouped card */
 function buildCardHTML(group, colorMap) {
   return `
     <div class="card ${colorMap[group.line] || ""}">
@@ -333,41 +132,30 @@ function buildCardHTML(group, colorMap) {
   `;
 }
 
-/* =========================================================
-   FILTER LOGIC
-   ========================================================= */
-
 function setFilter(city) {
   currentFilter = city;
-
-  /* Update button UI state */
   document.querySelectorAll(".filters button")
     .forEach(b => b.classList.remove("active"));
-
   document.getElementById(`btn-${city.toLowerCase()}`)
     .classList.add("active");
-
-  /* Re-render using cached data */
   renderData();
 }
 
-/* =========================================================
-   FETCH DATA
-   ========================================================= */
+/* ===============================
+   FETCH FROM SUPABASE
+================================ */
 
 async function fetchData() {
   try {
-    /* Add timestamp param to bypass browser cache */
-    const response = await fetch(TSV_URL + "&t=" + Date.now());
-    if (!response.ok) throw new Error("Network error");
+    const { data, error } = await supabase
+      .from("reports")
+      .select("*")
+      .gte("created_at", new Date(Date.now() - 24*60*60*1000).toISOString())
+      .order("created_at", { ascending: false });
 
-    const text = await response.text();
-    const rows = parseTSV(text);
+    if (error) throw error;
 
-    /* Must contain header + at least one data row */
-    if (rows.length <= 1) return;
-
-    cachedRows = rows;
+    cachedRows = data;
     updateStatus(true);
     renderData();
 
@@ -377,87 +165,45 @@ async function fetchData() {
   }
 }
 
-/* =========================================================
-   RENDER + GROUPING LOGIC
-   ========================================================= */
+/* ===============================
+   RENDER
+================================ */
 
 function renderData() {
   if (!cachedRows) return;
 
   const container = document.getElementById("updates-list");
-  const rows = [...cachedRows];
-  const headers = rows.shift(); // Remove header row
 
-  /* Resolve column indexes dynamically by name */
-  const col = name => headers.indexOf(name);
-
-  const idxMetro = col("Metro");
-  const idxLisboa = col("Linha do Metro de Lisboa");
-  const idxPorto = col("Linha do Metro do Porto");
-  const idxTimestamp = col("Carimbo de data/hora");
-  const idxPicas = col("Quantos picas?");
-  const idxTempo = col("Há quanto tempo?");
-
-  const directionColumns = {
-    "Azul": col("Direção - Linha Azul"),
-    "Verde": col("Direção - Linha Verde"),
-    "Amarela": col("Direção - Linha Amarela"),
-    "Vermelha": col("Direção - Linha Vermelha"),
-    "A": col("Direção - Linha A"),
-    "B": col("Direção - Linha B"),
-    "C": col("Direção - Linha C"),
-    "D": col("Direção - Linha D"),
-    "E": col("Direção - Linha E"),
-    "F": col("Direção - Linha F")
-  };
-
-  /*
-  Groups keyed by Line + Direction + Hour to prevent overcounting same inspectors across submissions.
-  */
   const groups = {};
 
-  rows.forEach(row => {
+  cachedRows.forEach(row => {
 
-    /* City filter */
-    if (row[idxMetro]?.trim() !== currentFilter) return;
+    if (row.city !== currentFilter) return;
 
-    /* Resolve line depending on city */
-    let line = currentFilter === "Lisboa" ? row[idxLisboa] : row[idxPorto];
-    if (!line) return;
-
-    line = line.replace("Linha ", "").trim();
-
-    const directionIndex = directionColumns[line];
-    if (directionIndex === undefined) return;
-
-    const direction = row[directionIndex];
-    if (!direction) return;
-
-    const timestamp = parseTimestamp(row[idxTimestamp]);
-    if (!timestamp) return;
-
-    /* Hour-based grouping */
+    const timestamp = new Date(row.created_at);
     const hourKey = `${timestamp.getFullYear()}-${timestamp.getMonth()}-${timestamp.getDate()}-${timestamp.getHours()}`;
-    const key = `${line}|${direction}|${hourKey}`;
+    const key = `${row.line}|${row.direction}|${hourKey}`;
 
     if (!groups[key]) {
-      groups[key] = { line, direction, count: 0, timestamp };
+      groups[key] = {
+        line: row.line,
+        direction: row.direction,
+        count: 0,
+        timestamp
+      };
     }
 
     groups[key].count += 1;
 
-    /* Instead of summing picas, take maximum value reported */
-    const num = parseInt(row[idxPicas]);
-    if (!isNaN(num)) {
+    if (row.picas) {
       groups[key].maxPicas = groups[key].maxPicas
-        ? Math.max(groups[key].maxPicas, num)
-        : num;
+        ? Math.max(groups[key].maxPicas, row.picas)
+        : row.picas;
     }
 
-    groups[key].tempo = row[idxTempo];
+    groups[key].tempo = row.tempo;
   });
 
-  /* Sort newest first */
   const groupedEntries =
     Object.values(groups).sort((a, b) => b.timestamp - a.timestamp);
 
@@ -483,7 +229,6 @@ function renderData() {
   container.innerHTML =
     groupedEntries.map(g => buildCardHTML(g, colorMap)).join("");
 
-  /* Update last sync time */
   document.getElementById("last-update").innerText =
     "Atualizado às " +
     new Date().toLocaleTimeString('pt-PT',{
@@ -492,12 +237,12 @@ function renderData() {
     });
 }
 
-/* =========================================================
+/* ===============================
    INIT
-   ========================================================= */
+================================ */
 
-fetchData();                 // Initial load
-setInterval(fetchData, 30000); // Refresh every 30 seconds
+fetchData();
+setInterval(fetchData, 15000); // now truly real-time
 
 </script>
 </body>
