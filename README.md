@@ -1,34 +1,34 @@
 # 🚇 Onde anda o pica?
 
-[ondeandaopica.pt](https://ondeandaopica.pt) é uma aplicação web leve que mostra avistamentos de revisores nos transportes públicos em Portugal.
+[ondeandaopica.pt](https://ondeandaopica.pt) é uma aplicação web que mapeia avistamentos recentes de revisores nos transportes públicos em Portugal.
 
-A aplicação apresenta apenas avistamentos submetidos nas últimas 24 horas — atualmente no Metro de Lisboa e no Metro do Porto.
+Atualmente cobre o Metro de Lisboa e o Metro do Porto — só são mostrados avistamentos das últimas 24 horas.
 
-Os relatos são submetidos de forma anónima por passageiros e apresentados em tempo quase real.
+Os relatos são submetidos anonimamente por passageiros e apresentados em tempo quase real. 
 
 ---
 
 ## 💻 Stack
 
-Este projeto foi construído com uma filosofia de baixo custo, simplicidade estrutural e infraestrutura mínima.
+Construído com uma filosofia de baixo custo, simplicidade estrutural e infraestrutura mínima.
 
 **Arquitetura:** HTML + Vanilla JS → Supabase (Postgres + RLS) → GitHub Pages
 
 | Camada        | Tecnologia              | Função                              |
 |---------------|-------------------------|--------------------------------------|
-| Frontend      | HTML + Vanilla JS       | UI, fetch de dados e renderização    |
-| Base de Dados | Supabase (Postgres)     | Armazenamento estruturado            |
+| Frontend      | HTML + JavaScript       | UI, fetch de dados e renderização    |
+| Backend       | Supabase (Postgres)     | Armazenamento estruturado com RLS    |
 | Hosting       | GitHub Pages            | Distribuição sob domínio próprio     |
 
 ---
 
 ## 🤝 Contribuir
 
-Se quiseres ajudar, abre um issue, faz uma fork, manda um PR, ou escreve para info@ondeandaopica.pt.
+Se quiseres ajudar, estás à vontade para contribuir. Abre um issue, faz um fork, manda um PR, ou escreve para info@ondeandaopica.pt.
 
 - 💻 Código: Pull requests são bem-vindos, sejam correções ou novas funcionalidades.
-- 🎨 UX/UI: Sugestões para melhorar a interface, especialmente a experiência mobile.
-- 🗺️ Expansão: Ajudar a mapear direções/estações de outras redes.
+- 🎨 UX/UI: Sugestões para tornar a interface mais fluida, especialmente em mobile.
+- 🗺️ Expansão: Ajudar a mapear e validar as linhas/direções de outras redes (e.g., CP).
 
 ---
 
@@ -38,7 +38,6 @@ Ideias em aberto:
 
 - Versão PWA instalável
 - Mitigação de spam
-- Heatmap por estação
 - Alertas por linha
 - Expansão para outras redes (e.g. CP)
 
@@ -50,4 +49,4 @@ Projeto experimental, independente e sem fins lucrativos, criado para partilha i
 
 Não tem qualquer afiliação a operadores de transportes públicos ou privados.
 
-Desenvolvido por um humano. Mantido pela comunidade.
+_Desenvolvido por um humano. Mantido pela comunidade._
