@@ -44,6 +44,19 @@ h1 { font-size:2.2rem; margin-bottom:6px; letter-spacing:-0.02em; }
   width:100%;margin-bottom:12px;padding:10px;border-radius:8px;border:1px solid #1e293b;background:#020617;color:#f1f5f9;
 }
 .close-btn { text-align:right;font-size:0.8rem;cursor:pointer;opacity:0.6;margin-bottom:10px;}
+
+/* [FIX 1] Success message shown after submit — hidden by default */
+.success-msg {
+  display:none;
+  background:rgba(34,197,94,0.12);
+  border:1px solid rgba(34,197,94,0.3);
+  color:#86efac;
+  border-radius:8px;
+  padding:10px 14px;
+  font-size:0.85rem;
+  margin-bottom:12px;
+  text-align:center;
+}
 </style>
 </head>
 <body>
@@ -83,8 +96,16 @@ h1 { font-size:2.2rem; margin-bottom:6px; letter-spacing:-0.02em; }
     <div class="close-btn" onclick="closeModal()">Fechar ✕</div>
     <h3>Reportar avistamento</h3>
 
+    <!-- [FIX 1] Success banner, shown briefly after a successful submit -->
+    <div id="successMsg" class="success-msg">✓ Avistamento reportado, obrigado!</div>
+
+    <!--
+      [FIX 3] Added `selected` to the city placeholder.
+      Without it, some mobile browsers (especially iOS Safari) ignore
+      the .value assignment in openModal() and show a blank select.
+    -->
     <select id="citySelect">
-      <option value="" disabled hidden>Cidade</option>
+      <option value="" disabled selected hidden>Cidade</option>
       <option value="Lisboa">Lisboa</option>
       <option value="Porto">Porto</option>
     </select>
@@ -128,11 +149,25 @@ function escapeHTML(str) {
 
 function openModal(){ 
   document.getElementById("reportModal").style.display="flex";
+
+  // Pre-select the city matching the current feed filter
   document.getElementById("citySelect").value = currentFilter;
+
+  // [FIX 4] Hide the success message in case it was visible from a previous open
+  document.getElementById("successMsg").style.display = "none";
+
   populateLines(currentFilter);
 }
 
-function closeModal(){ document.getElementById("reportModal").style.display="none"; }
+function closeModal(){
+  document.getElementById("reportModal").style.display="none";
+
+  // [FIX 4] Reset all selects so the modal is clean next time it opens
+  document.getElementById("citySelect").value = "";
+  document.getElementById("lineSelect").innerHTML = `<option value="" disabled selected hidden>Linha</option>`;
+  document.getElementById("directionSelect").innerHTML = `<option value="" disabled selected hidden>Direção</option>`;
+  document.getElementById("picasSelect").value = "";
+}
 
 async function loadLines(){
   const { data, error } = await supabaseClient.from("lines").select("*").order("name");
@@ -187,6 +222,7 @@ document.getElementById("citySelect").addEventListener("change", e => populateLi
 document.getElementById("lineSelect").addEventListener("change", e => loadDirections(e.target.value));
 
 async function submitReport(){
+  // Basic rate limiting via localStorage — one report per 5 minutes per browser
   const lastReport = localStorage.getItem('last_report_pica');
   if (lastReport && (Date.now() - parseInt(lastReport)) < 300000) {
     alert("Calma! Só podes reportar uma vez a cada 5 minutos.");
@@ -204,14 +240,25 @@ async function submitReport(){
   }
 
   const { error } = await supabaseClient.from("reports").insert([{
-    city, line, direction, picas: picas || null
+    city,
+    line,
+    direction,
+    // [picas is stored as integer, not the string "3+"]
+    picas: picas ? parseInt(picas) : null
   }]);
 
   if(error) {
     alert("Erro ao enviar. Tenta de novo.");
   } else {
     localStorage.setItem('last_report_pica', Date.now());
-    closeModal();
+
+    // [FIX 1] Show success message inside the modal for 2 seconds, then close
+    const msg = document.getElementById("successMsg");
+    msg.style.display = "block";
+    setTimeout(() => {
+      closeModal();
+      fetchReports();
+    }, 2000);
   }
 }
 
@@ -238,6 +285,12 @@ async function fetchReports(){
   }
 
   cachedReports = data || [];
+
+  // [FIX 2] Mark as live after a successful fetch, not just after realtime subscribes.
+  // Without this, a failed realtime subscription would leave the dot orange
+  // even if polling is working fine.
+  updateStatus(true);
+
   renderReports();
 }
 
@@ -291,12 +344,14 @@ async function init(){
   await loadLines();
   await fetchReports();
 
+  // Realtime subscription — updates the feed instantly when a new report is inserted
   const channel = supabaseClient.channel('reports-realtime');
   
   channel
     .on('postgres_changes',
       { event: 'INSERT', schema: 'public', table: 'reports' },
       payload => {
+        // Only add if not already in cache and matches the current city filter
         const exists = cachedReports.some(r => r.id === payload.new.id);
         if(!exists && payload.new.city === currentFilter){
           cachedReports.unshift(payload.new);
@@ -305,10 +360,12 @@ async function init(){
       }
     )
     .subscribe((status) => {
+      // Realtime channel status — only affects the dot if fetch hasn't already set it live
       if (status === 'SUBSCRIBED') updateStatus(true);
       else if (status === 'CLOSED' || status === 'CHANNEL_ERROR') updateStatus(false);
     });
 
+  // Native browser online/offline events as a fallback signal
   window.addEventListener('online', () => updateStatus(true));
   window.addEventListener('offline', () => updateStatus(false));
 }
