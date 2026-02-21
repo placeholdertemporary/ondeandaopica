@@ -215,10 +215,12 @@ async function fetchReports(){
   cachedReports = data || [];
   renderReports();
 }
-
 function renderReports(){
   const container = document.getElementById("updates-list");
-  const rows = cachedReports.filter(r=>r.city===currentFilter);
+
+  const rows = cachedReports.filter(
+    r => r.city && r.city.toLowerCase() === currentFilter.toLowerCase()
+  );
 
   if(rows.length===0){
     container.innerHTML =
@@ -226,17 +228,29 @@ function renderReports(){
     return;
   }
 
-  container.innerHTML = rows.map(r=>`
-    <div class="card">
-      <strong>Linha ${r.line} → ${r.direction}</strong>
-      ${r.picas ? `<div class="time">${r.picas} picas</div>` : ""}
-      <div class="time">${timeAgo(r.created_at)}</div>
-    </div>
-  `).join("");
+  container.innerHTML = rows.map(r => {
+
+    const lineObj = cachedLines.find(
+      l => l.name === r.line && l.city === r.city
+    );
+
+    const lineColor = lineObj ? lineObj.color : "#334155";
+
+    return `
+      <div class="card" style="border-left:6px solid ${lineColor}">
+        <strong>Linha ${r.line} → ${r.direction}</strong>
+        ${r.picas ? `<div class="time">${r.picas} picas</div>` : ""}
+        <div class="time">${timeAgo(r.created_at)}</div>
+      </div>
+    `;
+  }).join("");
 
   document.getElementById("last-update").innerText =
     "Atualizado às " +
-    new Date().toLocaleTimeString('pt-PT',{hour:'2-digit',minute:'2-digit'});
+    new Date().toLocaleTimeString('pt-PT',{
+      hour:'2-digit',
+      minute:'2-digit'
+    });
 }
 
 function setFilter(city){
