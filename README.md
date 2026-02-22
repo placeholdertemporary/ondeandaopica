@@ -9,7 +9,7 @@ Os relatos são submetidos anonimamente por passageiros e apresentados em tempo 
 
 ## 💻 Stack
 
-Construído com uma filosofia de baixo custo, simplicidade estrutural e infraestrutura mínima.
+Este projeto foi construído com uma filosofia de baixo custo e simplicidade estrutural.
 
 **Arquitetura:** HTML + Vanilla JavaScript → PostgreSQL
 
@@ -22,7 +22,7 @@ Construído com uma filosofia de baixo custo, simplicidade estrutural e infraest
 
 ## 🤝 Contribuir
 
-Abre um issue, faz um fork, manda um PR, ou escreve para info@ondeandaopica.pt.
+Se quiseres ajudar, abre um issue, manda um PR, ou escreve para info@ondeandaopica.pt.
 
 - 💻 Código: Pull requests são bem-vindos, sejam correções ou novas funcionalidades.
 - 🎨 UX/UI: Sugestões para tornar a interface mais fluida, especialmente em mobile.
