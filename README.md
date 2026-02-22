@@ -11,23 +11,22 @@ Os relatos são submetidos anonimamente por passageiros e apresentados em tempo 
 
 Construído com uma filosofia de baixo custo, simplicidade estrutural e infraestrutura mínima.
 
-**Arquitetura:** HTML + Vanilla JS → Supabase (Postgres + RLS) → GitHub Pages
+**Arquitetura:** HTML + Vanilla JavaScript → PostgreSQL
 
 | Camada        | Tecnologia              | Função                              |
 |---------------|-------------------------|--------------------------------------|
-| Frontend      | HTML + JavaScript       | UI, fetch de dados e renderização    |
+| Frontend      | HTML + JS               | UI, fetch de dados e renderização    |
 | Backend       | Supabase (Postgres)     | Armazenamento estruturado com RLS    |
 | Hosting       | GitHub Pages            | Distribuição sob domínio próprio     |
 
 
-
 ## 🤝 Contribuir
 
-Se quiseres ajudar, estás à vontade para contribuir. Abre um issue, faz um fork, manda um PR, ou escreve para info@ondeandaopica.pt.
+Abre um issue, faz um fork, manda um PR, ou escreve para info@ondeandaopica.pt.
 
 - 💻 Código: Pull requests são bem-vindos, sejam correções ou novas funcionalidades.
 - 🎨 UX/UI: Sugestões para tornar a interface mais fluida, especialmente em mobile.
-- 🗺️ Expansão: Ajudar a mapear e validar as linhas/direções de outras redes (e.g., CP).
+- 🗺️ Expansão: Ajudar a mapear e validar as linhas e direções de comboios.
 
 
 ## 🛠 Roadmap
@@ -35,9 +34,8 @@ Se quiseres ajudar, estás à vontade para contribuir. Abre um issue, faz um for
 Ideias em aberto:
 
 - Versão PWA instalável
-- Mitigação de spam
-- Alertas por linha
-- Expansão para outras redes (e.g. CP)
+- Notificações de alerta por linha
+- Expansão para redes ferroviárias
 
 
 ## ⚠️ Disclaimer
