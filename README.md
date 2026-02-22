@@ -2,7 +2,7 @@
 
 [ondeandaopica.pt](https://ondeandaopica.pt) é uma aplicação web que mapeia avistamentos recentes de revisores nos transportes públicos em Portugal.
 
-Atualmente cobre o Metro de Lisboa e o Metro do Porto — só são mostrados avistamentos das últimas 24 horas.
+Atualmente cobre o Metro de Lisboa e o Metro do Porto, e só são mostrados avistamentos das últimas 24 horas.
 
 Os relatos são submetidos anonimamente por passageiros e apresentados em tempo quase real. 
 
