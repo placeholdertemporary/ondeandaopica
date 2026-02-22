@@ -10,11 +10,11 @@ Os relatos são submetidos anonimamente por passageiros e apresentados em tempo 
 
 Este projeto foi construído com uma filosofia de baixo custo e simplicidade estrutural.
 
-**Arquitetura:** HTML + Vanilla JavaScript → PostgreSQL
+**Arquitetura:** HTML + Vanilla JS → PostgreSQL
 
 | Camada        | Tecnologia              | Função                              |
 |---------------|-------------------------|--------------------------------------|
-| Frontend      | HTML + JS               | UI, fetch de dados e renderização    |
+| Frontend      | HTML + JavaScript       | UI, fetch de dados e renderização    |
 | Backend       | Supabase (Postgres)     | Armazenamento estruturado com RLS    |
 | Hosting       | GitHub Pages            | Distribuição sob domínio próprio     |
 
