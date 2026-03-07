@@ -1,4 +1,4 @@
-const CACHE_NAME = 'oapica-v2';
+const CACHE_NAME = 'oapica-v3';
 const STATIC_ASSETS = ['/', '/index.html', '/manifest.json', '/preview.png'];
 self.addEventListener('install', event => {
   event.waitUntil(
