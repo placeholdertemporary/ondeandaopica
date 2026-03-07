@@ -3,7 +3,6 @@
 
 <!-- ============================================================
      HEAD
-     Meta tags, PWA setup, and all styles.
      ============================================================ -->
 <head>
 <meta charset="UTF-8">
@@ -15,14 +14,12 @@
 <link rel="apple-touch-icon" href="/preview.png">
 <link rel="manifest" href="/manifest.json">
 
-<!-- Register service worker for PWA / offline support -->
 <script>
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js');
   }
 </script>
 
-<!-- Open Graph tags for link previews -->
 <meta name="theme-color" content="#09090b">
 <meta property="og:title" content="Onde anda o pica?">
 <meta property="og:description" content="O passe pesa na carteira — a multa ainda mais.">
@@ -30,7 +27,6 @@
 <meta property="og:url" content="https://ondeandaopica.pt">
 <meta property="og:image" content="https://ondeandaopica.pt/preview.png">
 
-<!-- Distinctive font: DM Mono for data/labels, DM Sans for UI text -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
@@ -48,13 +44,17 @@
   --text-muted:   #71717a;
   --text-dim:     #3f3f46;
   --red:          #e5392b;
+  --red-dark:     #c2291e;
   --red-glow:     rgba(229,57,43,0.2);
   --green:        #22c55e;
   --amber:        #f59e0b;
   --font-ui:      'DM Sans', sans-serif;
   --font-mono:    'DM Mono', monospace;
-  --radius:       12px;
-  --radius-sm:    8px;
+
+  /* Nudged up from 12/8 for a softer, more polished feel */
+  --radius:       16px;
+  --radius-sm:    10px;
+  --radius-pill:  999px;
 }
 
 /* ---- Reset & base ---- */
@@ -76,9 +76,7 @@ body {
 }
 
 /* ---- Header ---- */
-header {
-  padding: 20px 0 28px;
-}
+header { padding: 20px 0 28px; }
 .header-top {
   display: flex;
   justify-content: space-between;
@@ -122,68 +120,93 @@ h1 {
   line-height: 1.5;
 }
 
-/* ---- Report CTA ---- */
-.cta-wrapper { margin-bottom: 28px; }
-.cta-button {
+/* ---- Report CTA ----
+   Less wide than full-bleed: auto width, centered, min-width keeps it
+   readable on small screens without spanning the whole viewport.
+   Gradient + inner highlight give it depth and craft vs a flat slab.
+   The top inner highlight (box-shadow inset) catches light like a
+   physical button would. */
+.cta-wrapper {
   display: flex;
+  justify-content: center;
+  margin-bottom: 28px;
+}
+.cta-button {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  width: 100%;
-  background: var(--red);
+  min-width: 220px;
+  max-width: 320px;
+  width: 60%;
+  background: linear-gradient(180deg, #e8473a 0%, #d42e22 100%);
   color: #fff;
-  padding: 16px;
-  border-radius: var(--radius);
+  padding: 14px 24px;
+  border-radius: var(--radius-pill);
   font-family: var(--font-ui);
-  font-size: 0.95rem;
+  font-size: 0.92rem;
   font-weight: 700;
   letter-spacing: 0.02em;
   cursor: pointer;
-  border: none;
-  box-shadow: 0 0 0 0 var(--red-glow);
+  border: 1px solid rgba(255,255,255,0.12); /* subtle inner rim */
+  /* Outer glow on hover + inner top highlight that simulates a lit surface */
+  box-shadow:
+    0 0 0 0 var(--red-glow),
+    inset 0 1px 0 rgba(255,255,255,0.18);
   transition: transform 0.1s, box-shadow 0.2s;
   -webkit-tap-highlight-color: transparent;
 }
-.cta-button:active { transform: scale(0.98); }
-.cta-button:hover  { box-shadow: 0 0 0 6px var(--red-glow); }
-.cta-icon { font-size: 1.1rem; }
-
-/* ---- City filter ---- */
-.filters {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 20px;
+.cta-button:active { transform: scale(0.97); }
+.cta-button:hover {
+  box-shadow:
+    0 0 0 6px var(--red-glow),
+    inset 0 1px 0 rgba(255,255,255,0.18);
 }
-.filters button {
-  flex: 1;
+.cta-icon { font-size: 1rem; }
+
+/* ---- City toggle ----
+   A single pill container that holds both city options.
+   The active option gets a filled white chip that slides in place.
+   Much cleaner than two independent buttons — reads as "pick one". */
+.city-toggle {
+  display: inline-flex;
   background: var(--surface);
   border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  padding: 3px;
+  margin-bottom: 20px;
+  gap: 2px;
+}
+.city-toggle button {
+  flex: 1;
+  background: transparent;
+  border: none;
   color: var(--text-muted);
-  padding: 10px;
-  border-radius: var(--radius-sm);
+  padding: 8px 20px;
+  border-radius: var(--radius-pill);
   cursor: pointer;
   font-family: var(--font-ui);
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   font-weight: 600;
-  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  transition: background 0.18s, color 0.18s;
   -webkit-tap-highlight-color: transparent;
+  white-space: nowrap;
 }
-.filters button.active {
+.city-toggle button.active {
   background: var(--text);
-  border-color: var(--text);
   color: var(--bg);
 }
 
-/* ---- Status bar ---- */
+/* ---- Status bar ----
+   No frame, no background — just floating label + dot.
+   "Sincronizado" says something meaningful about data freshness
+   rather than the generic "Conectado" which describes the socket. */
 .status-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 16px;
-  padding: 10px 12px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
+  padding: 0 2px;
 }
 .status-left {
   display: flex;
@@ -210,7 +233,10 @@ h1 {
   letter-spacing: 0.04em;
 }
 
-/* ---- Feed cards ---- */
+/* ---- Feed cards ----
+   Hover/press state lifts the card with a shadow + tiny translateY.
+   This makes the feed feel tactile and interactive rather than a
+   static list — especially important for the tappable group cards. */
 @keyframes cardIn {
   from { opacity: 0; transform: translateY(6px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -226,15 +252,37 @@ h1 {
   align-items: center;
   gap: 14px;
   animation: cardIn 0.2s ease both;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
 }
+.card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  border-color: var(--border-hover);
+}
+.card:active {
+  transform: translateY(0px);
+  box-shadow: none;
+}
+
 .card-body { flex: 1; min-width: 0; }
+
+/* Line name row: color dot + text side by side */
 .card-line {
+  display: flex;
+  align-items: center;
+  gap: 7px;
   font-size: 0.95rem;
   font-weight: 700;
   margin-bottom: 3px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+}
+/* The line color dot — set via inline style on the element itself */
+.line-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  /* fallback color if JS hasn't resolved the line yet */
+  background: var(--text-dim);
 }
 .card-direction {
   font-size: 0.82rem;
@@ -269,11 +317,7 @@ h1 {
   letter-spacing: 0.02em;
 }
 
-/* ---- Bell button ----
-   Unsubscribed: nearly invisible (0.25 opacity), reveals on hover.
-   Subscribed: fully visible with amber tint via CSS filter.
-   The filter trick shifts the 🔔 emoji toward gold without needing
-   a separate image asset. */
+/* ---- Bell button ---- */
 .bell-btn {
   background: none;
   border: none;
@@ -306,8 +350,6 @@ h1 {
   margin-top: 5px;
   letter-spacing: 0.02em;
 }
-
-/* Individual cards nested inside an expanded group */
 .card-group-children {
   display: none;
   padding-left: 12px;
@@ -358,7 +400,7 @@ h1 {
   .modal { align-items: center; justify-content: center; }
   .modal-content {
     border: 1px solid var(--border);
-    border-radius: 16px;
+    border-radius: var(--radius);
     padding: 28px;
     max-width: 400px;
     width: 90%;
@@ -378,11 +420,7 @@ h1 {
   align-items: center;
   margin-bottom: 20px;
 }
-.modal-title {
-  font-size: 1rem;
-  font-weight: 700;
-  margin: 0;
-}
+.modal-title { font-size: 1rem; font-weight: 700; margin: 0; }
 .close-btn {
   font-family: var(--font-mono);
   font-size: 0.75rem;
@@ -471,7 +509,7 @@ h1 {
   .about-panel { align-items: center; justify-content: center; }
   .about-panel-content {
     border: 1px solid var(--border);
-    border-radius: 16px;
+    border-radius: var(--radius);
     padding: 32px;
     max-width: 440px;
     width: 90%;
@@ -491,22 +529,14 @@ h1 {
   align-items: center;
   margin-bottom: 24px;
 }
-.about-panel-title {
-  font-size: 1rem;
-  font-weight: 700;
-  margin: 0;
-}
+.about-panel-title { font-size: 1rem; font-weight: 700; margin: 0; }
 .about-description {
   font-size: 0.9rem;
   color: var(--text-muted);
   line-height: 1.7;
   margin: 0 0 28px;
 }
-.about-links {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
+.about-links { display: flex; flex-direction: column; gap: 10px; }
 .about-link {
   display: flex;
   align-items: center;
@@ -532,11 +562,7 @@ h1 {
   padding: 2px 6px;
   flex-shrink: 0;
 }
-.about-divider {
-  border: none;
-  border-top: 1px solid var(--border);
-  margin: 24px 0;
-}
+.about-divider { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
 .about-footer {
   font-family: var(--font-mono);
   font-size: 0.68rem;
@@ -563,9 +589,7 @@ h1 {
 .install-banner {
   display: none;
   position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  bottom: 0; left: 0; right: 0;
   z-index: 200;
   padding: 12px 16px 28px;
   background: var(--surface);
@@ -579,24 +603,10 @@ h1 {
   to   { transform: translateY(0); }
 }
 .install-banner.visible { display: flex; }
-.install-banner-text {
-  flex: 1;
-  min-width: 0;
-}
-.install-banner-title {
-  font-size: 0.88rem;
-  font-weight: 700;
-  margin-bottom: 2px;
-}
-.install-banner-sub {
-  font-size: 0.78rem;
-  color: var(--text-muted);
-}
-.install-banner-actions {
-  display: flex;
-  gap: 8px;
-  flex-shrink: 0;
-}
+.install-banner-text { flex: 1; min-width: 0; }
+.install-banner-title { font-size: 0.88rem; font-weight: 700; margin-bottom: 2px; }
+.install-banner-sub  { font-size: 0.78rem; color: var(--text-muted); }
+.install-banner-actions { display: flex; gap: 8px; flex-shrink: 0; }
 .install-btn {
   padding: 9px 16px;
   border-radius: var(--radius-sm);
@@ -607,19 +617,15 @@ h1 {
   border: none;
   -webkit-tap-highlight-color: transparent;
 }
-.install-btn-primary { background: var(--red); color: #fff; }
-.install-btn-dismiss {
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  color: var(--text-muted);
-}
+.install-btn-primary  { background: var(--red); color: #fff; }
+.install-btn-dismiss  { background: var(--surface-2); border: 1px solid var(--border); color: var(--text-muted); }
 
 </style>
 </head>
 
 
 <!-- ============================================================
-     BODY: HTML structure
+     BODY
      ============================================================ -->
 <body>
 
@@ -640,11 +646,13 @@ h1 {
     </button>
   </div>
 
-  <div class="filters">
+  <!-- City toggle: pill container, one active chip slides between options -->
+  <div class="city-toggle">
     <button id="btn-lisboa" class="active" onclick="setFilter('Lisboa')">Lisboa</button>
     <button id="btn-porto" onclick="setFilter('Porto')">Porto</button>
   </div>
 
+  <!-- Status bar: frameless, just floating text + dot -->
   <div class="status-bar">
     <div class="status-left">
       <span id="status-dot" class="indicator-dot stale-dot"></span>
@@ -663,14 +671,11 @@ h1 {
 <div id="reportModal" class="modal">
   <div class="modal-content">
     <div class="modal-handle"></div>
-
     <div class="modal-header">
       <h3 class="modal-title">Pica avistado</h3>
       <div class="close-btn" onclick="closeModal()">Fechar ✕</div>
     </div>
-
     <div id="successMsg" class="success-msg">✓ Avistamento reportado! A malta agradece.</div>
-
     <div class="field">
       <label for="citySelect">Cidade</label>
       <select id="citySelect">
@@ -679,23 +684,20 @@ h1 {
         <option value="Porto">Porto</option>
       </select>
     </div>
-
     <div class="field">
       <label for="lineSelect">Linha</label>
       <select id="lineSelect" disabled>
         <option value="" disabled selected hidden>Qual é a linha?</option>
       </select>
     </div>
-
     <div class="field">
       <label for="directionSelect">Direção</label>
       <select id="directionSelect" disabled>
         <option value="" disabled selected hidden>Em que direção?</option>
       </select>
     </div>
-
     <div class="field">
-      <label for="picasSelect">Nº de picas <span style="opacity:0.5;font-size:0.9em"></span></label>
+      <label for="picasSelect">Nº de picas</label>
       <select id="picasSelect">
         <option value="" disabled selected hidden>Quantos viste?</option>
         <option value="1">1</option>
@@ -703,7 +705,6 @@ h1 {
         <option value="3">3+</option>
       </select>
     </div>
-
     <button id="submitBtn" onclick="submitReport()">Enviar avistamento</button>
   </div>
 </div>
@@ -715,33 +716,26 @@ h1 {
 <div id="aboutPanel" class="about-panel">
   <div class="about-panel-content">
     <div class="about-panel-handle"></div>
-
     <div class="about-panel-header">
       <h3 class="about-panel-title">Sobre o projeto</h3>
       <div class="close-btn" onclick="closeAbout()">Fechar ✕</div>
     </div>
-
     <p class="about-description">
       Andar de transportes públicos tem as suas surpresas. Este site existe para
       que estejas um bocadinho mais informado.<br><br>
       É um projeto experimental feito por passageiros, para passageiros.<br><br>
       Reporta anonimamente e partilha com quem conheces.
     </p>
-
     <div class="about-links">
-
       <a class="about-link" id="emailLink" href="#">
         <span class="about-link-icon">email</span>
         <span id="emailDisplay"></span>
       </a>
-
       <a class="about-link" href="https://github.com/placeholdertemporary/ondeandaopica" target="_blank" rel="noopener noreferrer">
         <span class="about-link-icon">github</span>
         ondeandaopica
       </a>
-
     </div>
-
     <hr class="about-divider">
     <div class="about-footer">Desenvolvido por um humano, mantido pela comunidade.</div>
   </div>
@@ -767,7 +761,6 @@ h1 {
      JAVASCRIPT
      ============================================================ -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <script>
 
 // ============================================================
@@ -779,13 +772,7 @@ const supabaseClient = window.supabase.createClient(
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlsdWV0aWdhZmFpdXd4b3RlemF5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2ODc5NDEsImV4cCI6MjA4NzI2Mzk0MX0.spjBm2SFPUfbLWxl1hzhL0nssUsW0l73XRgTVS3MuQU"
 );
 
-// Your VAPID public key. Safe to include here — it's the public half of the pair.
-// The browser uses it to cryptographically bind push subscriptions to your server,
-// so only your Edge Function (which holds the private key) can send pushes to them.
-const VAPID_PUBLIC_KEY = "BBYd2csjsDCrmMSeR6oEd6OcVxxBZf6olwAGQfsZznNmic08U2EwsIo1RuqpnfiR6K21QFuOYxJJAbUhaLPsapI";
-
-// Maximum number of simultaneous push subscriptions per device.
-// Enforced client-side — no need for a DB constraint since the UI controls it.
+const VAPID_PUBLIC_KEY  = "BBYd2csjsDCrmMSeR6oEd6OcVxxBZf6olwAGQfsZznNmic08U2EwsIo1RuqpnfiR6K21QFuOYxJJAbUhaLPsapI";
 const MAX_SUBSCRIPTIONS = 4;
 
 
@@ -800,9 +787,6 @@ let currentFilter    = "Lisboa";
 let realtimeChannel  = null;
 let installPromptEvt = null;
 
-// In-memory Set of active subscription keys for this device.
-// Key format: "city|line|direction"
-// Persisted to localStorage so bells render correctly across page loads.
 let activeSubscriptions = new Set();
 const SUBS_STORAGE_KEY  = "oapica_subscriptions";
 
@@ -824,8 +808,8 @@ function timeAgo(ts) {
   if (diffMin === 1) return "há 1 min";
   if (diffMin < 60)  return `há ${diffMin} min`;
   const diffHours = Math.floor(diffMin / 60);
-  if (diffHours === 1)  return "há 1h";
-  if (diffHours < 24)  return `há ${diffHours}h`;
+  if (diffHours === 1) return "há 1h";
+  if (diffHours < 24) return `há ${diffHours}h`;
   return "há mais de 24h";
 }
 
@@ -833,16 +817,14 @@ function updateStatus(isLive) {
   const dot  = document.getElementById("status-dot");
   const text = document.getElementById("status-text");
   if (isLive) {
-    dot.className = "indicator-dot live-dot";
-    text.innerText = "Conectado";
+    dot.className  = "indicator-dot live-dot";
+    text.innerText = "Sincronizado";
   } else {
-    dot.className = "indicator-dot stale-dot";
+    dot.className  = "indicator-dot stale-dot";
     text.innerText = "Desatualizado";
   }
 }
 
-// Converts the VAPID public key from base64url to Uint8Array.
-// pushManager.subscribe() requires this exact binary format — a plain string won't work.
 function urlBase64ToUint8Array(base64String) {
   const padding = '='.repeat((4 - base64String.length % 4) % 4);
   const base64  = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
@@ -850,8 +832,6 @@ function urlBase64ToUint8Array(base64String) {
   return Uint8Array.from([...raw].map(c => c.charCodeAt(0)));
 }
 
-// Canonical local key for a subscription. Pipe-delimited because
-// city/line/direction values won't contain pipes.
 function subKey(city, line, direction) {
   return `${city}|${line}|${direction}`;
 }
@@ -859,9 +839,6 @@ function subKey(city, line, direction) {
 
 // ============================================================
 // SUBSCRIPTION PERSISTENCE
-// Subscription keys are stored in localStorage as a JSON array.
-// This is purely for UI state (which bells are lit) — the actual
-// push delivery authority lives in the Supabase subscriptions table.
 // ============================================================
 
 function loadSubscriptionsFromStorage() {
@@ -869,7 +846,7 @@ function loadSubscriptionsFromStorage() {
     const stored = localStorage.getItem(SUBS_STORAGE_KEY);
     if (stored) activeSubscriptions = new Set(JSON.parse(stored));
   } catch (e) {
-    activeSubscriptions = new Set(); // corrupt storage — start fresh
+    activeSubscriptions = new Set();
   }
 }
 
@@ -880,44 +857,29 @@ function saveSubscriptionsToStorage() {
 
 // ============================================================
 // GROUPING ALGORITHM
-// Groups reports by city + line + direction using a sliding 30-minute window.
-// A report joins a group if it is within 30 min of ANY report already in that group.
-// Groups of 3+ render as a collapsible group card. Groups of 1-2 render individually.
+// Sliding 30-minute window, groups by city + line + direction.
+// 3+ reports → collapsible group card. 1-2 → individual cards.
 // ============================================================
 
 function groupReports(reports) {
   const WINDOW_MS = 30 * 60 * 1000;
-  const groups = [];
+  const groups    = [];
 
   for (const report of reports) {
     const ts = new Date(report.created_at).getTime();
-
     let joined = false;
+
     for (const group of groups) {
-      if (group.city !== report.city) continue;
-      if (group.line !== report.line) continue;
-      if (group.direction !== report.direction) continue;
+      if (group.city !== report.city || group.line !== report.line || group.direction !== report.direction) continue;
 
-      const withinWindow = group.reports.some(r => {
-        const diff = Math.abs(ts - new Date(r.created_at).getTime());
-        return diff <= WINDOW_MS;
-      });
+      const withinWindow = group.reports.some(r =>
+        Math.abs(ts - new Date(r.created_at).getTime()) <= WINDOW_MS
+      );
 
-      if (withinWindow) {
-        group.reports.push(report);
-        joined = true;
-        break;
-      }
+      if (withinWindow) { group.reports.push(report); joined = true; break; }
     }
 
-    if (!joined) {
-      groups.push({
-        city:      report.city,
-        line:      report.line,
-        direction: report.direction,
-        reports:   [report]
-      });
-    }
+    if (!joined) groups.push({ city: report.city, line: report.line, direction: report.direction, reports: [report] });
   }
 
   return groups;
@@ -925,19 +887,15 @@ function groupReports(reports) {
 
 
 // ============================================================
-// CARD RENDERING HELPERS
+// CARD RENDERING
 // ============================================================
 
-// Builds the bell button HTML. Values go through data-* attributes to avoid
-// any escaping issues with special characters in line/direction names.
 function renderBellBtn(city, line, direction) {
   const key        = subKey(city, line, direction);
   const subscribed = activeSubscriptions.has(key);
-  const cls        = subscribed ? "bell-btn subscribed" : "bell-btn";
-  const title      = subscribed ? "Cancelar alerta" : "Receber alerta para esta direção";
   return `<button
-    class="${cls}"
-    title="${title}"
+    class="bell-btn${subscribed ? " subscribed" : ""}"
+    title="${subscribed ? "Cancelar alerta" : "Receber alerta para esta direção"}"
     data-city="${escapeHTML(city)}"
     data-line="${escapeHTML(line)}"
     data-direction="${escapeHTML(direction)}"
@@ -945,9 +903,8 @@ function renderBellBtn(city, line, direction) {
   >🔔</button>`;
 }
 
-// Renders a single report card.
-// showBell controls whether the bell appears — used to suppress it on
-// the older card when a group of exactly 2 renders as individual cards.
+// showBell = false on the second card of a 2-report group and on group children —
+// one bell per direction is enough, no need to repeat it.
 function renderSingleCard(r, animationDelay, showBell = true) {
   const lineObj   = cachedLines.find(l => l.name === r.line && l.city === r.city);
   const lineColor = lineObj ? lineObj.color : "#3f3f46";
@@ -959,7 +916,11 @@ function renderSingleCard(r, animationDelay, showBell = true) {
   return `
     <div class="card" style="animation-delay:${animationDelay}ms; border-left-color:${lineColor}">
       <div class="card-body">
-        <div class="card-line">Linha ${escapeHTML(r.line)}</div>
+        <div class="card-line">
+          <!-- Color dot echoes the left border accent for faster scanning -->
+          <span class="line-dot" style="background:${lineColor}"></span>
+          Linha ${escapeHTML(r.line)}
+        </div>
         <div class="card-direction">→ ${escapeHTML(r.direction)}</div>
       </div>
       <div class="card-meta">
@@ -970,27 +931,18 @@ function renderSingleCard(r, animationDelay, showBell = true) {
     </div>`;
 }
 
-// Renders a group of 3+ reports as a collapsible group card.
-// The bell on the header subscribes to the whole group's direction.
-// stopPropagation in handleBellClick prevents the tap from also toggling the group.
-// Child cards inside the expanded list never show bells — the header bell covers them.
 function renderGroupCard(group, groupIndex, animationDelay) {
   const lineObj   = cachedLines.find(l => l.name === group.line && l.city === group.city);
   const lineColor = lineObj ? lineObj.color : "#3f3f46";
   const glowStyle = `border-left-color:${lineColor}; box-shadow: inset 4px 0 12px -3px ${lineColor}40;`;
 
-  const newest = group.reports[0];
-  const count  = group.reports.length;
-
+  const newest     = group.reports[0];
+  const count      = group.reports.length;
   const picasLabel = newest.picas
     ? `<div class="card-picas">${newest.picas >= 3 ? "3+" : newest.picas} pica${newest.picas !== 1 ? "s" : ""}</div>`
     : "";
 
-  // Child cards never show bells (showBell = false) — the group header covers it
-  const childCards = group.reports
-    .map(r => renderSingleCard(r, 0, false))
-    .join("");
-
+  const childCards = group.reports.map(r => renderSingleCard(r, 0, false)).join("");
   const childrenId = `group-children-${groupIndex}`;
 
   return `
@@ -998,7 +950,10 @@ function renderGroupCard(group, groupIndex, animationDelay) {
          style="animation-delay:${animationDelay}ms; ${glowStyle}"
          onclick="toggleGroup('${childrenId}')">
       <div class="card-body">
-        <div class="card-line">Linha ${escapeHTML(group.line)}</div>
+        <div class="card-line">
+          <span class="line-dot" style="background:${lineColor}"></span>
+          Linha ${escapeHTML(group.line)}
+        </div>
         <div class="card-direction">→ ${escapeHTML(group.direction)}</div>
         <div class="card-group-badge">🔥 ${count} avistamentos agrupados</div>
       </div>
@@ -1024,7 +979,7 @@ function toggleGroup(childrenId) {
 // ============================================================
 
 function handleBellClick(event) {
-  event.stopPropagation(); // prevent group card toggle from firing
+  event.stopPropagation();
   const btn = event.currentTarget;
   toggleSubscription(btn.dataset.city, btn.dataset.line, btn.dataset.direction);
 }
@@ -1033,61 +988,44 @@ async function toggleSubscription(city, line, direction) {
   const key = subKey(city, line, direction);
 
   if (activeSubscriptions.has(key)) {
-    // Unsubscribing — delete the specific row from Supabase.
-    // With the composite unique constraint, we need to match on all four
-    // columns to target exactly this device + direction combination.
     const pushSub = await getPushSubscription();
     if (pushSub) {
-      const endpoint = pushSub.endpoint;
       await supabaseClient
         .from("subscriptions")
         .delete()
-        .eq("endpoint", endpoint)
+        .eq("endpoint", pushSub.endpoint)
         .eq("city", city)
         .eq("line", line)
         .eq("direction", direction);
-      // We don't block on errors here — if the delete fails the row is
-      // harmless (the Edge Function would notify but the SW would receive
-      // a push for a direction the user no longer cares about, which is
-      // a minor nuisance at worst). Local state is what the user sees.
     }
-
     activeSubscriptions.delete(key);
     saveSubscriptionsToStorage();
     renderReports();
     return;
   }
 
-  // Enforce the 4-subscription cap before doing anything async
   if (activeSubscriptions.size >= MAX_SUBSCRIPTIONS) {
     alert(`Já tens ${MAX_SUBSCRIPTIONS} alertas ativos. Cancela um antes de adicionar outro.`);
     return;
   }
 
-  // Check browser support
   if (!('Notification' in window) || !('PushManager' in window)) {
     alert("O teu browser não suporta notificações push. Tenta no Chrome ou Firefox.");
     return;
   }
 
-  // Handle permission — denied means the user has to go to browser settings,
-  // default means we show the native prompt, granted means proceed silently
   let permission = Notification.permission;
   if (permission === 'denied') {
     alert("Bloqueaste as notificações para este site. Para ativar, vai às definições do browser e permite notificações para ondeandaopica.pt.");
     return;
   }
-  if (permission === 'default') {
-    permission = await Notification.requestPermission();
-  }
-  if (permission !== 'granted') return; // user dismissed the prompt — fail silently
+  if (permission === 'default') permission = await Notification.requestPermission();
+  if (permission !== 'granted') return;
 
   const registration = await navigator.serviceWorker.ready;
 
   let pushSubscription;
   try {
-    // The browser returns the existing push subscription if one already exists
-    // for this origin + VAPID key pair, so this is safe to call every time
     pushSubscription = await registration.pushManager.subscribe({
       userVisibleOnly: true,
       applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
@@ -1099,19 +1037,10 @@ async function toggleSubscription(city, line, direction) {
   }
 
   const subJson  = pushSubscription.toJSON();
-  const endpoint = subJson.endpoint;
-  const p256dh   = subJson.keys.p256dh;
-  const auth     = subJson.keys.auth;
-
-  // Insert a new row for this device + direction.
-  // The composite unique constraint (endpoint, city, line, direction) means
-  // if this exact combination already exists, upsert updates p256dh/auth in
-  // case the browser rotated the keys — otherwise it inserts a fresh row.
-  // This is what allows one device to hold up to MAX_SUBSCRIPTIONS rows.
   const { error } = await supabaseClient
     .from("subscriptions")
     .upsert(
-      { endpoint, p256dh, auth, city, line, direction },
+      { endpoint: subJson.endpoint, p256dh: subJson.keys.p256dh, auth: subJson.keys.auth, city, line, direction },
       { onConflict: "endpoint, city, line, direction" }
     );
 
@@ -1126,16 +1055,11 @@ async function toggleSubscription(city, line, direction) {
   renderReports();
 }
 
-// Helper that returns the current push subscription if one exists,
-// or null if the browser hasn't subscribed yet. Used when unsubscribing
-// to get the endpoint without re-triggering the permission flow.
 async function getPushSubscription() {
   try {
-    const registration = await navigator.serviceWorker.ready;
-    return await registration.pushManager.getSubscription();
-  } catch (e) {
-    return null;
-  }
+    const reg = await navigator.serviceWorker.ready;
+    return await reg.pushManager.getSubscription();
+  } catch (e) { return null; }
 }
 
 
@@ -1145,22 +1069,13 @@ async function getPushSubscription() {
 
 async function loadStaticData() {
   const { data: linesData, error: linesError } = await supabaseClient
-    .from("lines")
-    .select("*")
-    .order("name");
+    .from("lines").select("*").order("name");
 
-  if (linesError) {
-    console.error("Error loading lines:", linesError);
-    updateStatus(false);
-    return false;
-  }
+  if (linesError) { console.error("Error loading lines:", linesError); updateStatus(false); return false; }
   cachedLines = linesData || [];
 
   const { data: dirData, error: dirError } = await supabaseClient
-    .from("directions")
-    .select("*")
-    .order("label");
-
+    .from("directions").select("*").order("label");
   if (!dirError) cachedDirections = dirData || [];
 
   return true;
@@ -1184,7 +1099,6 @@ async function openModal() {
       return;
     }
   }
-
   populateLines(currentFilter);
 }
 
@@ -1203,16 +1117,15 @@ function closeModal() {
   document.getElementById("picasSelect").value = "";
 
   const submitBtn = document.getElementById("submitBtn");
-  submitBtn.disabled  = false;
-  submitBtn.innerText = "Enviar avistamento";
+  submitBtn.disabled   = false;
+  submitBtn.innerText  = "Enviar avistamento";
   submitBtn.style.display = "block";
 }
 
 function populateLines(city) {
   const lineSelect = document.getElementById("lineSelect");
-  lineSelect.value = "";
+  lineSelect.value    = "";
   lineSelect.disabled = false;
-
   lineSelect.innerHTML =
     `<option value="" disabled selected hidden>Qual é a linha?</option>` +
     cachedLines
@@ -1231,7 +1144,6 @@ function loadDirections(lineName) {
   if (!line) return;
 
   const matchedDirs = cachedDirections.filter(d => d.line_id === line.id);
-
   const directionSelect = document.getElementById("directionSelect");
   directionSelect.disabled = false;
   directionSelect.innerHTML =
@@ -1243,7 +1155,6 @@ function loadDirections(lineName) {
 
 document.getElementById("citySelect").addEventListener("change", e => populateLines(e.target.value));
 document.getElementById("lineSelect").addEventListener("change", e => loadDirections(e.target.value));
-
 document.getElementById("reportModal").addEventListener("click", e => {
   if (e.target === document.getElementById("reportModal")) closeModal();
 });
@@ -1255,8 +1166,7 @@ document.getElementById("reportModal").addEventListener("click", e => {
 
 async function submitReport() {
   const COOLDOWN_MS = 2 * 60 * 1000;
-
-  const lastReport = localStorage.getItem('last_report_pica');
+  const lastReport  = localStorage.getItem('last_report_pica');
   if (lastReport) {
     const elapsed = Date.now() - parseInt(lastReport);
     if (elapsed < COOLDOWN_MS) {
@@ -1276,14 +1186,12 @@ async function submitReport() {
     return;
   }
 
-  const submitBtn = document.getElementById("submitBtn");
+  const submitBtn     = document.getElementById("submitBtn");
   submitBtn.disabled  = true;
   submitBtn.innerText = "A enviar...";
 
   const { error } = await supabaseClient.from("reports").insert([{
-    city,
-    line,
-    direction,
+    city, line, direction,
     picas: picas ? parseInt(picas) : null
   }]);
 
@@ -1295,11 +1203,7 @@ async function submitReport() {
     localStorage.setItem('last_report_pica', Date.now());
     document.getElementById("successMsg").style.display = "block";
     submitBtn.style.display = "none";
-
-    setTimeout(() => {
-      closeModal();
-      fetchReports();
-    }, 2000);
+    setTimeout(() => { closeModal(); fetchReports(); }, 2000);
   }
 }
 
@@ -1315,11 +1219,7 @@ async function fetchReports() {
     .eq("city", currentFilter)
     .order("created_at", { ascending: false });
 
-  if (error) {
-    console.error("Error fetching reports:", error);
-    updateStatus(false);
-    return;
-  }
+  if (error) { console.error("Error fetching reports:", error); updateStatus(false); return; }
 
   cachedReports = data || [];
   updateStatus(true);
@@ -1337,16 +1237,15 @@ function renderReports() {
   const container = document.getElementById("updates-list");
 
   if (cachedReports.length === 0) {
-    const emptyMessages = [
+    const msgs = [
       "Nenhum avistamento nas últimas 24h. Sorte a tua!",
       "Tudo calmo por aqui. Por enquanto...",
       "Nem sinal deles. Aproveita!"
     ];
-    const emptyMsg = emptyMessages[Math.floor(Math.random() * emptyMessages.length)];
     container.innerHTML = `
       <div class="empty">
         <span class="empty-icon">🟢</span>
-        ${emptyMsg}
+        ${msgs[Math.floor(Math.random() * msgs.length)]}
       </div>`;
     return;
   }
@@ -1354,56 +1253,41 @@ function renderReports() {
   if (cachedLines.length === 0) loadStaticData();
 
   const groups = groupReports(cachedReports);
-
   let cardIndex = 0;
+
   container.innerHTML = groups.map((group, groupIndex) => {
     const delay = cardIndex * 40;
     cardIndex++;
 
     if (group.reports.length >= 3) {
-      // Group card — bell on header, no bells on children
       return renderGroupCard(group, groupIndex, delay);
     } else {
-      // 1 or 2 individual cards — bell only on the first (most recent) one.
-      // For a group of 1 that's always the only card.
-      // For a group of 2 the second card is an older duplicate sighting
-      // for the same direction — one bell is enough.
       return group.reports.map((r, i) => {
         const d = cardIndex * 40;
         cardIndex++;
-        return renderSingleCard(r, d, i === 0); // showBell only for index 0
+        return renderSingleCard(r, d, i === 0); // bell only on most recent
       }).join("");
     }
   }).join("");
 }
 
 function setupRealtime() {
-  if (realtimeChannel) {
-    supabaseClient.removeChannel(realtimeChannel);
-  }
+  if (realtimeChannel) supabaseClient.removeChannel(realtimeChannel);
 
-  realtimeChannel = supabaseClient.channel(`reports-${currentFilter}`);
-
-  realtimeChannel
-    .on(
-      'postgres_changes',
-      {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'reports',
-        filter: `city=eq.${currentFilter}`
-      },
+  realtimeChannel = supabaseClient
+    .channel(`reports-${currentFilter}`)
+    .on('postgres_changes',
+      { event: 'INSERT', schema: 'public', table: 'reports', filter: `city=eq.${currentFilter}` },
       payload => {
-        const exists = cachedReports.some(r => r.id === payload.new.id);
-        if (!exists) {
+        if (!cachedReports.some(r => r.id === payload.new.id)) {
           cachedReports.unshift(payload.new);
           renderReports();
         }
       }
     )
     .subscribe(status => {
-      if (status === 'SUBSCRIBED')                                  updateStatus(true);
-      else if (status === 'CLOSED' || status === 'CHANNEL_ERROR')  updateStatus(false);
+      if (status === 'SUBSCRIBED')                                 updateStatus(true);
+      else if (status === 'CLOSED' || status === 'CHANNEL_ERROR') updateStatus(false);
     });
 }
 
@@ -1414,12 +1298,9 @@ function setupRealtime() {
 
 async function setFilter(city) {
   currentFilter = city;
-
-  document.querySelectorAll(".filters button").forEach(b => b.classList.remove("active"));
+  document.querySelectorAll(".city-toggle button").forEach(b => b.classList.remove("active"));
   document.getElementById(`btn-${city.toLowerCase()}`).classList.add("active");
-
   document.getElementById("updates-list").innerHTML = `<div class="empty">Já, já...</div>`;
-
   await fetchReports();
   setupRealtime();
 }
@@ -1430,17 +1311,11 @@ async function setFilter(city) {
 // ============================================================
 
 const email = ["info", "ondeandaopica.pt"].join("@");
-document.getElementById("emailLink").href = "mailto:" + email;
+document.getElementById("emailLink").href    = "mailto:" + email;
 document.getElementById("emailDisplay").innerText = email;
 
-function openAbout() {
-  document.getElementById("aboutPanel").style.display = "flex";
-}
-
-function closeAbout() {
-  document.getElementById("aboutPanel").style.display = "none";
-}
-
+function openAbout()  { document.getElementById("aboutPanel").style.display = "flex"; }
+function closeAbout() { document.getElementById("aboutPanel").style.display = "none"; }
 document.getElementById("aboutPanel").addEventListener("click", e => {
   if (e.target === document.getElementById("aboutPanel")) closeAbout();
 });
@@ -1479,9 +1354,7 @@ window.addEventListener('appinstalled', () => {
 // ============================================================
 
 async function init() {
-  // Load subscription keys before first render so bells are correct immediately
   loadSubscriptionsFromStorage();
-
   await loadStaticData();
   await fetchReports();
   setupRealtime();
