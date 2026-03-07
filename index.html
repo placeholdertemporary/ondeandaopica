@@ -631,7 +631,7 @@ h1 {
 
     <div class="about-links">
 
-      <a class="about-link" href="mailto:info@ondeandaopica.pt">
+      <a class="about-link" id="emailLink" href="#">
         <span class="about-link-icon">email</span>
         info@ondeandaopica.pt
       </a>
@@ -654,7 +654,7 @@ h1 {
      ============================================================ -->
 
 <!-- Supabase JS client (loaded from CDN, no build step needed) -->
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
 
@@ -1048,6 +1048,10 @@ async function setFilter(city) {
 // ABOUT PANEL
 // ============================================================
 
+// Build the email link in JS so Cloudflare's email obfuscation
+// doesn't inject a script tag that breaks page load order.
+document.getElementById("emailLink").href = "mailto:" + "info@ondeandaopica.pt";
+
 function openAbout() {
   document.getElementById("aboutPanel").style.display = "flex";
 }
@@ -1071,10 +1075,4 @@ document.getElementById("aboutPanel").addEventListener("click", e => {
 async function init() {
   await loadStaticData();
   await fetchReports();
-  setupRealtime();
-
-  // Safety net: re-fetch every 5 minutes in case realtime drops
-  setInterval(() => fetchReports(), 300000);
-
-  // Refresh relative timestamps ("há X min") every 60s without a network call
-  setInterval(() => renderReports(), 60000);
+  setupRealtime
