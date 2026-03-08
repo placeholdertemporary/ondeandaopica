@@ -121,11 +121,9 @@ h1 {
 }
 
 /* ---- Report CTA ----
-   Less wide than full-bleed: auto width, centered, min-width keeps it
-   readable on small screens without spanning the whole viewport.
-   Gradient + inner highlight give it depth and craft vs a flat slab.
-   The top inner highlight (box-shadow inset) catches light like a
-   physical button would. */
+   Auto width, centered, min-width keeps it readable on small screens without spanning the whole viewport.
+   Gradient + inner highlight give it depth and craft.  The top inner highlight (box-shadow inset)
+   catches light like a physical button would. */
 .cta-wrapper {
   display: flex;
   justify-content: center;
@@ -167,7 +165,7 @@ h1 {
 /* ---- City toggle ----
    A single pill container that holds both city options.
    The active option gets a filled white chip that slides in place.
-   Much cleaner than two independent buttons — reads as "pick one". */
+ */
 .city-toggle {
   display: inline-flex;
   background: var(--surface);
@@ -198,9 +196,8 @@ h1 {
 }
 
 /* ---- Status bar ----
-   No frame, no background — just floating label + dot.
-   "Sincronizado" says something meaningful about data freshness
-   rather than the generic "Conectado" which describes the socket. */
+   Floating label + dot.
+   Label describes data freshness */
 .status-bar {
   display: flex;
   justify-content: space-between;
@@ -234,9 +231,8 @@ h1 {
 }
 
 /* ---- Feed cards ----
-   Hover/press state lifts the card with a shadow + tiny translateY.
-   This makes the feed feel tactile and interactive rather than a
-   static list — especially important for the tappable group cards. */
+   Hover/press state lifts the card with a shadow + tiny translateY to make the feed tactile and interactive.
+*/
 @keyframes cardIn {
   from { opacity: 0; transform: translateY(6px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -813,8 +809,8 @@ function timeAgo(ts) {
   return "há mais de 24h";
 }
 
-// Delayed stale indicator — only shows "Desatualizado" if the failure persists for more than 1500ms.
-// Transient blips (e.g. channel teardown during a city switch) resolve faster than that and never reach the user.
+// Stale indicator only shows if the failure persists for more than 1500ms.
+// Transient blips (e.g. channel teardown during a city switch) never reach the user.
 let staleTimer = null;
 
 function updateStatus(isLive) {
