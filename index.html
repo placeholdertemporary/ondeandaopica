@@ -813,15 +813,28 @@ function timeAgo(ts) {
   return "há mais de 24h";
 }
 
+// Delayed stale indicator — only shows "Desatualizado" if the failure persists for more than 1500ms.
+// Transient blips (e.g. channel teardown during a city switch) resolve faster than that and never reach the user.
+let staleTimer = null;
+
 function updateStatus(isLive) {
   const dot  = document.getElementById("status-dot");
   const text = document.getElementById("status-text");
+
   if (isLive) {
+    // Clear any pending stale timer — we recovered before it fired
+    if (staleTimer) { clearTimeout(staleTimer); staleTimer = null; }
     dot.className  = "indicator-dot live-dot";
     text.innerText = "Sincronizado";
   } else {
-    dot.className  = "indicator-dot stale-dot";
-    text.innerText = "Desatualizado";
+    // Only flip to stale if the condition lasts long enough to be real
+    if (!staleTimer) {
+      staleTimer = setTimeout(() => {
+        dot.className  = "indicator-dot stale-dot";
+        text.innerText = "Desatualizado";
+        staleTimer = null;
+      }, 1500);
+    }
   }
 }
 
@@ -835,7 +848,6 @@ function urlBase64ToUint8Array(base64String) {
 function subKey(city, line, direction) {
   return `${city}|${line}|${direction}`;
 }
-
 
 // ============================================================
 // SUBSCRIPTION PERSISTENCE
