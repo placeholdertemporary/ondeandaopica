@@ -1237,19 +1237,20 @@ async function fetchReports() {
 
 function renderReports() {
   const container = document.getElementById("updates-list");
-
-  if (cachedReports.length === 0) {
-    const msgs = [
-      "Nenhum avistamento nas últimas 24h. Sorte a tua!",
-      "Tudo calmo por aqui. Por enquanto...",
-      "Nem sinal deles. Aproveita!"
-    ];
-container.innerHTML = `
-  <div class="empty">
-    ${emptyMsg}
-  </div>`;
-    return;
-  }
+     
+if (cachedReports.length === 0) {
+  const emptyMessages = [
+    "Nenhum avistamento nas últimas 24h. Sorte a tua!",
+    "Tudo calmo por aqui. Por enquanto...",
+    "Nem sinal deles... Aproveita!"
+  ];
+  const emptyMsg = emptyMessages[Math.floor(Math.random() * emptyMessages.length)];
+  container.innerHTML = `
+    <div class="empty">
+      ${emptyMsg}
+    </div>`;
+  return;
+}
 
   if (cachedLines.length === 0) loadStaticData();
 
