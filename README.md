@@ -1,16 +1,10 @@
 # 🚇 Onde anda o pica?
 
-[ondeandaopica.pt](https://ondeandaopica.pt) é uma web app que mapeia avistamentos de revisores nos transportes públicos em Portugal.
+[ondeandaopica.pt](https://ondeandaopica.pt) é uma web app que mapeia avistamentos de revisores nos transportes públicos em Portugal (cobrindo atualmente os metros de Lisboa e Porto).
 
-Atualmente cobre o metro de Lisboa e o metro do Porto, com relatos anónimos submetidos por passageiros.
+O feed em tempo real mosta os avistamentos das últimas 24 horas por cidade, a partir de relatos submetidos anonimaente por passageitos, atualizados automaticamente por WebSocket.
 
-## ✨ Funcionalidades
-
-- Avistamentos das últimas 24 horas, por cidade
-- Atualização em tempo real via WebSocket
-- Agrupamento de avistamentos próximos na mesma linha e direção
-- Alertas push por linha e direção (instalação PWA não necessária)
-- Interface otimizada para mobile
+É agora possível subscrever notificações push para alertas de linhas/direções específicas.
 
 ## 💻 Stack
 
